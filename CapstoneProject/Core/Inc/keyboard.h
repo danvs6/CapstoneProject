@@ -1,6 +1,9 @@
 #ifndef INC_KEYBOARD_H_
 #define INC_KEYBOARD_H_
 
+#define TOTAL_ROWS 3
+#define TOTAL_COLUMNS 11 // controlled by mux
+
 // Set the control pins based on the channel (binary)
 void setMuxChannel(uint8_t channel);
 
