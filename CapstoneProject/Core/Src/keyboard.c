@@ -1,5 +1,4 @@
 #include "keyboard.h"
-#include "gpio.h"
 
 
 // Set the control pins based on the channel (binary)
@@ -15,10 +14,10 @@ void setMuxChannel(uint8_t channel)
 }
 
 // Function to check the COM pin for a key press (returns 1 if pressed, 0 if not)
-uint8_t readMuxInput(void)
+uint8_t readMuxInput()
 {
 	// Read the state of the COM pin (HIGH means no key pressed, LOW means key pressed)
-	return HAL_GPIO_ReadPin(GPIOA, COM_PIN) == GPIO_PIN_RESET ? 1 : 0;
+	return HAL_GPIO_ReadPin(GPIOA, COM_PIN_Pin) == GPIO_PIN_RESET ? 1 : 0;
 }
 
 // Function to scan MUX channels 0 to 10 and check for key presses
@@ -61,6 +60,26 @@ int scanRows()
     }
 
     return -1; // no keypress
+}
+
+void scanKeyboardMatrix()
+{
+	// scan columns using MUX
+	int column = scanColumns();
+
+	if (column != -1)
+	{
+		printf("Key Press Detected in Column %d/n", column);
+	}
+
+	int row = scanRows();
+
+	if (row != -1)
+	{
+		printf("Key Press Detected in Row %d/n", row);
+		// Handle the key press event here...
+	}
+
 }
 
 
