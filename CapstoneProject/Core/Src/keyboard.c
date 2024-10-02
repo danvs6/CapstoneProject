@@ -5,19 +5,19 @@
 void setMuxChannel(uint8_t channel)
 {
 	// Set S0 and S1 on GPIOC
-	HAL_GPIO_WritePin(GPIOC, S0_PIN_Pin, (channel & 0x01) ? GPIO_PIN_SET : GPIO_PIN_RESET); // checks bit 0
-	HAL_GPIO_WritePin(GPIOC, S1_PIN_Pin, (channel & 0x02) ? GPIO_PIN_SET : GPIO_PIN_RESET); // checks bit 1
+	HAL_GPIO_WritePin(S0_PIN_GPIO_Port, S0_PIN_Pin, (channel & 0x01) ? GPIO_PIN_SET : GPIO_PIN_RESET); // checks bit 0
+	HAL_GPIO_WritePin(S1_PIN_GPIO_Port, S1_PIN_Pin, (channel & 0x02) ? GPIO_PIN_SET : GPIO_PIN_RESET); // checks bit 1
 
 	// Set S2 and S3 on GPIOA
-	HAL_GPIO_WritePin(GPIOA, S2_PIN_Pin, (channel & 0x04) ? GPIO_PIN_SET : GPIO_PIN_RESET); // checks bit 2
-	HAL_GPIO_WritePin(GPIOA, S3_PIN_Pin, (channel & 0x08) ? GPIO_PIN_SET : GPIO_PIN_RESET); // checks bit 3
+	HAL_GPIO_WritePin(S2_PIN_GPIO_Port, S2_PIN_Pin, (channel & 0x04) ? GPIO_PIN_SET : GPIO_PIN_RESET); // checks bit 2
+	HAL_GPIO_WritePin(S3_PIN_GPIO_Port, S3_PIN_Pin, (channel & 0x08) ? GPIO_PIN_SET : GPIO_PIN_RESET); // checks bit 3
 }
 
 // Function to check the COM pin for a key press (returns 1 if pressed, 0 if not)
 uint8_t readMuxInput()
 {
 	// Read the state of the COM pin (HIGH means no key pressed, LOW means key pressed)
-	return HAL_GPIO_ReadPin(GPIOA, COM_PIN_Pin) == GPIO_PIN_RESET ? 1 : 0;
+	return HAL_GPIO_ReadPin(COM_PIN_GPIO_Port, COM_PIN_Pin) == GPIO_PIN_RESET ? 1 : 0;
 }
 
 // Function to scan MUX channels 0 to 10 and check for key presses
@@ -44,17 +44,17 @@ int scanColumns()
 int scanRows()
 {
 	// Read each row GPIO pin
-    if (HAL_GPIO_ReadPin(GPIOE, ROW1_PIN) == GPIO_PIN_RESET)
+    if (HAL_GPIO_ReadPin(ROW1_PIN_GPIO_Port, ROW1_PIN) == GPIO_PIN_RESET)
     {
         return 1; // Row 1 pressed
     }
 
-    if (HAL_GPIO_ReadPin(GPIOE, ROW2_PIN) == GPIO_PIN_RESET)
+    if (HAL_GPIO_ReadPin(ROW2_PIN_GPIO_Port, ROW2_PIN) == GPIO_PIN_RESET)
     {
         return 2; // Row 2 pressed
     }
 
-    if (HAL_GPIO_ReadPin(GPIOE, ROW3_PIN) == GPIO_PIN_RESET)
+    if (HAL_GPIO_ReadPin(ROW3_PIN_GPIO_Port, ROW3_PIN) == GPIO_PIN_RESET)
     {
         return 3; // Row 3 pressed
     }

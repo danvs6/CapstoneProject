@@ -37,6 +37,9 @@ extern "C" {
 #define ROW2_PIN Y1_PIN_Pin
 #define ROW3_PIN Y2_PIN_Pin
 
+#define ROW1_PIN_GPIO_Port Y0_PIN_GPIO_Port
+#define ROW2_PIN_GPIO_Port Y1_PIN_GPIO_Port
+#define ROW3_PIN_GPIO_Port Y2_PIN_GPIO_Port
 /* USER CODE END Private defines */
 
 void MX_GPIO_Init(void);
