@@ -1,4 +1,5 @@
 #include "keyboard.h"
+#include "gpio.h"
 
 
 // Set the control pins based on the channel (binary)
@@ -17,23 +18,49 @@ void setMuxChannel(uint8_t channel)
 uint8_t readMuxInput(void)
 {
 	// Read the state of the COM pin (HIGH means no key pressed, LOW means key pressed)
-	return HAL_GPIO_ReadPin(COM_PORT, COM_PIN) == GPIO_PIN_RESET ? 1 : 0;
+	return HAL_GPIO_ReadPin(GPIOA, COM_PIN) == GPIO_PIN_RESET ? 1 : 0;
 }
 
 // Function to scan MUX channels 0 to 10 and check for key presses
-void scanMuxChannels()
+int scanColumns()
 {
-	for (uint8_t channel = 0; channel < 11; channel++)
-	{
-		setMuxChannel(channel); // set the current channel
+    for (uint8_t column = 0; column < 10; column++)
+    {
+        // Set the MUX to the current column
+        setMuxChannel(column);
 
-		HAL_Delay(0); // 1 ms delay
+        HAL_Delay(0); // 1 ms
 
-		if (readMuxInput())
-		{
-			// A key is pressed, handle the key press
-		}
-	}
+        // Check if a key press is detected in this column (COM pin is LOW)
+        if (readMuxInput())
+        {
+            return column;  // Return the column where a key press was detected
+        }
+    }
+
+    return -1; // No key press detected in any column
+}
+
+
+int scanRows()
+{
+	// Read each row GPIO pin
+    if (HAL_GPIO_ReadPin(GPIOE, ROW1_PIN) == GPIO_PIN_RESET)
+    {
+        return 1; // Row 1 pressed
+    }
+
+    if (HAL_GPIO_ReadPin(GPIOE, ROW2_PIN) == GPIO_PIN_RESET)
+    {
+        return 2; // Row 2 pressed
+    }
+
+    if (HAL_GPIO_ReadPin(GPIOE, ROW3_PIN) == GPIO_PIN_RESET)
+    {
+        return 3; // Row 3 pressed
+    }
+
+    return -1; // no keypress
 }
 
 

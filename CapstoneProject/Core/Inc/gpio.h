@@ -33,6 +33,9 @@ extern "C" {
 /* USER CODE END Includes */
 
 /* USER CODE BEGIN Private defines */
+#define ROW1_PIN Y0_PIN
+#define ROW2_PIN Y1_PIN
+#define ROW3_PIN Y2_PIN
 
 /* USER CODE END Private defines */
 
