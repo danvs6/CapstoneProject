@@ -13,18 +13,28 @@ void setMuxChannel(uint8_t channel)
 	HAL_GPIO_WritePin(GPIOA, S3_PIN_Pin, (channel & 0x08) ? GPIO_PIN_SET : GPIO_PIN_RESET); // checks bit 3
 }
 
-// Read the state of the COM pin (connected to the MUX); returns 0 or 1
+// Function to check the COM pin for a key press (returns 1 if pressed, 0 if not)
 uint8_t readMuxInput(void)
 {
-	return HAL_GPIO_ReadPin(COM_PORT, COM_PIN) == GPIO_PIN_RESET; // active low switches
+	// Read the state of the COM pin (HIGH means no key pressed, LOW means key pressed)
+	return HAL_GPIO_ReadPin(COM_PORT, COM_PIN) == GPIO_PIN_RESET ? 1 : 0;
 }
 
-// Scan the matrix keyboard continuously
-void scanKeyboardMatrix(void)
+// Function to scan MUX channels 0 to 10 and check for key presses
+void scanMuxChannels()
 {
+	for (uint8_t channel = 0; channel < 11; channel++)
+	{
+		setMuxChannel(channel); // set the current channel
 
+		HAL_Delay(0); // 1 ms delay
+
+		if (readMuxInput())
+		{
+			// A key is pressed, handle the key press
+		}
+	}
 }
-
 
 
 
