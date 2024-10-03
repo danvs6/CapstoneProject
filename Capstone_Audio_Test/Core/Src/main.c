@@ -105,17 +105,19 @@ int main(void)
   MX_DMA_Init();
   MX_I2C1_Init();
   MX_I2S3_Init();
-  MX_FATFS_Init();
   MX_USB_HOST_Init();
+  MX_FATFS_Init();
   /* USER CODE BEGIN 2 */
   CS43_Init(hi2c1, MODE_I2S);
-  CS43_SetVolume(150); //he changed it from the set api, this goes from 0-255
+  CS43_SetVolume(255); //he changed it from the set api, this goes from 0-255
   CS43_Enable_RightLeft(CS43_RIGHT_LEFT);
 
   audioI2S_setHandle(&hi2s3);
 
   bool isSdCardMounted=0;
   bool pauseResumeToggle=0;
+
+  bool ANDREW=0;
   /* USER CODE END 2 */
 
   /* Infinite loop */

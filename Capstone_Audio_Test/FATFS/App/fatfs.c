@@ -24,7 +24,7 @@ FATFS USBHFatFS;    /* File system object for USBH logical drive */
 FIL USBHFile;       /* File object for USBH */
 
 /* USER CODE BEGIN Variables */
-
+int checker_retUSBH = 0;
 /* USER CODE END Variables */
 
 void MX_FATFS_Init(void)
