@@ -4,9 +4,9 @@ int column = -1;
 int row = -1;
 
 char keyMatrix[3][11] = {
-    {'Start', 'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P'},
-    {'End', 'A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', 'Delete'},
-    {'HELP', 'Z', 'X', 'C', 'V', 'B', 'N', 'M', 'Enter', 'Space', ''}
+    {'s', 'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P'},
+    {'e', 'A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', 'd'},
+    {'h', 'Z', 'X', 'C', 'V', 'B', 'N', 'M', 'n', 'p', 'm'}
 };
 
 // Set the control pins based on the channel (binary)
@@ -52,17 +52,17 @@ int scanRows()
 	// Read each row GPIO pin
     if (HAL_GPIO_ReadPin(ROW1_PIN_GPIO_Port, ROW1_PIN) == GPIO_PIN_RESET)
     {
-        return 1; // Row 1 pressed
+        return 0; // Row 1 pressed
     }
 
     if (HAL_GPIO_ReadPin(ROW2_PIN_GPIO_Port, ROW2_PIN) == GPIO_PIN_RESET)
     {
-        return 2; // Row 2 pressed
+        return 1; // Row 2 pressed
     }
 
     if (HAL_GPIO_ReadPin(ROW3_PIN_GPIO_Port, ROW3_PIN) == GPIO_PIN_RESET)
     {
-        return 3; // Row 3 pressed
+        return 2; // Row 3 pressed
     }
 
     return -1; // no keypress
@@ -75,21 +75,21 @@ int setRowsScanColumns()
 	HAL_GPIO_WritePin(ROW2_PIN_GPIO_Port, ROW2_PIN, GPIO_PIN_SET);
 	HAL_GPIO_WritePin(ROW3_PIN_GPIO_Port, ROW3_PIN, GPIO_PIN_RESET);
 	if (scanColumns() == column) {
-		return 3;
+		return 2;
 	}
 	// set rows 1 and 3, check columns corresponding to row 2
 	HAL_GPIO_WritePin(ROW1_PIN_GPIO_Port, ROW1_PIN, GPIO_PIN_SET);
 	HAL_GPIO_WritePin(ROW2_PIN_GPIO_Port, ROW2_PIN, GPIO_PIN_RESET);
 	HAL_GPIO_WritePin(ROW3_PIN_GPIO_Port, ROW3_PIN, GPIO_PIN_SET);
 	if (scanColumns() == column) {
-		return 2;
+		return 1;
 	}
 	// set rows 2 and 3, check columns corresponding to row 1
 	HAL_GPIO_WritePin(ROW1_PIN_GPIO_Port, ROW1_PIN, GPIO_PIN_RESET);
 	HAL_GPIO_WritePin(ROW2_PIN_GPIO_Port, ROW2_PIN, GPIO_PIN_SET);
 	HAL_GPIO_WritePin(ROW3_PIN_GPIO_Port, ROW3_PIN, GPIO_PIN_SET);
 	if (scanColumns() == column) {
-		return 1;
+		return 0;
 	}
 	return -1;
 }

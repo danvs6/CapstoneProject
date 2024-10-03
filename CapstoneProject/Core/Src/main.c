@@ -20,7 +20,7 @@
 #include "main.h"
 #include "usb_host.h"
 #include "gpio.h"
-
+#include "screen.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include <stdio.h>
@@ -93,6 +93,23 @@ int main(void)
   MX_USB_HOST_Init();
   /* USER CODE BEGIN 2 */
 
+  Lcd_PortType ports[] = {
+        LCD_D4_GPIO_Port, LCD_D5_GPIO_Port, LCD_D6_GPIO_Port, LCD_D7_GPIO_Port
+    };
+    Lcd_PinType pins[] = {LCD_D4_Pin, LCD_D5_Pin, LCD_D6_Pin, LCD_D7_Pin};
+
+    // Create LCD handle and initialize it
+    Lcd_HandleTypeDef lcd = Lcd_create(ports, pins, LCD_RS_GPIO_Port, LCD_RS_Pin, LCD_E_GPIO_Port, LCD_E_Pin, LCD_4_BIT_MODE);
+
+    // Clear the screen before printing
+    Lcd_clear(&lcd);
+
+    // Print "Hello World!" on the LCD
+    Lcd_string(&lcd, "Hello Phi and An");
+
+    // Move the cursor to the second line and print a number
+    Lcd_cursor(&lcd, 1, 0);  // Move to second row, first column
+    Lcd_string(&lcd, "drew!!!");
   /* USER CODE END 2 */
 
   /* Infinite loop */
