@@ -105,11 +105,11 @@ int main(void)
     Lcd_clear(&lcd);
 
     // Print "Hello World!" on the LCD
-    Lcd_string(&lcd, "Hello Phi and An");
+    Lcd_string(&lcd, "RAHHHHHHHHH");
 
     // Move the cursor to the second line and print a number
-    Lcd_cursor(&lcd, 1, 0);  // Move to second row, first column
-    Lcd_string(&lcd, "drew!!!");
+    //Lcd_cursor(&lcd, 1, 0);  // Move to second row, first column
+    //Lcd_string(&lcd, "drew!!!");
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -119,6 +119,14 @@ int main(void)
 
     /* USER CODE END WHILE */
     MX_USB_HOST_Process();
+    for(int i = 0; i < 61; i++){
+    	Lcd_clear(&lcd);
+    	Lcd_int(&lcd, i);
+    	HAL_Delay(201);
+    }
+    Lcd_clear(&lcd);
+    Lcd_string(&lcd, "HAPPY BIRTHDAY!!!");
+    HAL_Delay(100001);
 
     /* USER CODE BEGIN 3 */
   }
