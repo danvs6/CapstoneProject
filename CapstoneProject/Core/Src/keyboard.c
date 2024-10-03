@@ -2,6 +2,13 @@
 
 int column = -1;
 int row = -1;
+
+char keyMatrix[3][11] = {
+    {'Start', 'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P'},
+    {'End', 'A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', 'Delete'},
+    {'HELP', 'Z', 'X', 'C', 'V', 'B', 'N', 'M', 'Enter', 'Space', ''}
+};
+
 // Set the control pins based on the channel (binary)
 void setMuxChannel(uint8_t channel)
 {

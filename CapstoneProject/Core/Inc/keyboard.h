@@ -17,6 +17,8 @@ int scanColumns();
 // scan the rows of the matrix for key presses
 int scanRows();
 
+int setRowsScanColumns();
+
 // Scan the matrix keyboard continuously
 void scanKeyboardMatrix();
 
