@@ -52,7 +52,7 @@ I2S_HandleTypeDef hi2s3;
 DMA_HandleTypeDef hdma_spi3_tx;
 
 /* USER CODE BEGIN PV */
-#define WAV_FILE1 "testFile1.wav"
+#define WAV_FILE1 "a.wav" // NEED A SHORT ASS FILENAME (< 8 characters)
 
 /* USER CODE END PV */
 
@@ -117,7 +117,6 @@ int main(void)
   bool isSdCardMounted=0;
   bool pauseResumeToggle=0;
 
-  bool ANDREW=0;
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -161,7 +160,7 @@ int main(void)
     					if (HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0)){
     						wavPlayer_stop();
     					}
-    					{
+    					else {
     					wavPlayer_resume();
     					}
     				}
