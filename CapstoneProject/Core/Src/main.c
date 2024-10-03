@@ -20,10 +20,10 @@
 #include "main.h"
 #include "usb_host.h"
 #include "gpio.h"
-#include "keyboard.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include <stdio.h>
 
 /* USER CODE END Includes */
 
@@ -69,18 +69,6 @@ int main(void)
 {
 
   /* USER CODE BEGIN 1 */
-	// using printf to output to console
-	int _write(int le, char *ptr, int len)
-	{
-		int DataIdx;
-
-		for(DataIdx = 0; DataIdx < len; DataIdx++)
-		{
-			ITM_SendChar(*ptr++);
-		}
-
-		return len;
-	}
 
   /* USER CODE END 1 */
 
@@ -111,8 +99,7 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	  printf("Hello World \n");
-	  HAL_Delay(1000);
+
     /* USER CODE END WHILE */
     MX_USB_HOST_Process();
 
