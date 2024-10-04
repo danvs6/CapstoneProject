@@ -119,11 +119,13 @@ int main(void)
 
     /* USER CODE END WHILE */
     MX_USB_HOST_Process();
-    for(int i = 0; i < 61; i++){
+    for(int i = 0; i < 61; i++)
+    {
     	Lcd_clear(&lcd);
     	Lcd_int(&lcd, i);
     	HAL_Delay(201);
     }
+
     Lcd_clear(&lcd);
     Lcd_string(&lcd, "HAPPY BIRTHDAY!!!");
     HAL_Delay(100001);

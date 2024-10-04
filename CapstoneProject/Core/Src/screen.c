@@ -48,6 +48,7 @@ void Lcd_init(Lcd_HandleTypeDef * lcd)
 			lcd_write_command(lcd, 0x32);
 			lcd_write_command(lcd, FUNCTION_SET | OPT_N);				// 4-bit mode
 	}
+
 	else
 		lcd_write_command(lcd, FUNCTION_SET | OPT_DL | OPT_N);
 
@@ -100,9 +101,12 @@ void Lcd_clear(Lcd_HandleTypeDef * lcd) {
 	lcd_write_command(lcd, CLEAR_DISPLAY);
 }
 
-void Lcd_define_char(Lcd_HandleTypeDef * lcd, uint8_t code, uint8_t bitmap[]){
+void Lcd_define_char(Lcd_HandleTypeDef * lcd, uint8_t code, uint8_t bitmap[])
+{
 	lcd_write_command(lcd, SETCGRAM_ADDR + (code << 3));
-	for(uint8_t i=0;i<8;++i){
+
+	for(uint8_t i=0;i<8;++i)
+	{
 		lcd_write_data(lcd, bitmap[i]);
 	}
 
@@ -123,6 +127,7 @@ void lcd_write_command(Lcd_HandleTypeDef * lcd, uint8_t command)
 		lcd_write(lcd, (command >> 4), LCD_NIB);
 		lcd_write(lcd, command & 0x0F, LCD_NIB);
 	}
+
 	else
 	{
 		lcd_write(lcd, command, LCD_BYTE);
@@ -142,6 +147,7 @@ void lcd_write_data(Lcd_HandleTypeDef * lcd, uint8_t data)
 		lcd_write(lcd, data >> 4, LCD_NIB);
 		lcd_write(lcd, data & 0x0F, LCD_NIB);
 	}
+
 	else
 	{
 		lcd_write(lcd, data, LCD_BYTE);
@@ -160,7 +166,7 @@ void lcd_write(Lcd_HandleTypeDef * lcd, uint8_t data, uint8_t len)
 	}
 
 	HAL_GPIO_WritePin(lcd->en_port, lcd->en_pin, 1);
-	DELAY(1);
+	HAL_Delay(1);
 	HAL_GPIO_WritePin(lcd->en_port, lcd->en_pin, 0); 		// Data receive on falling edge
 }
 
