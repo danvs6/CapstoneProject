@@ -18,11 +18,9 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-#include "usart.h"
 #include "usb_host.h"
 #include "gpio.h"
-#include "keyboard.h"
-#include "screen.h"
+
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include <stdio.h>
@@ -55,6 +53,7 @@ uint8_t i = 0; // Declare i variable
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
+void MX_USB_HOST_Process(void);
 
 /* USER CODE BEGIN PFP */
 
@@ -95,7 +94,6 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_USB_HOST_Init();
-  MX_USART3_UART_Init();
   /* USER CODE BEGIN 2 */
 
   Lcd_PortType ports[] = {
@@ -120,19 +118,6 @@ int main(void)
 
     /* USER CODE END WHILE */
     MX_USB_HOST_Process();
-    //mockScanKeyboardMatrix(&lcd);
-    sprintf((char *) OutputBuffer, "Hello, World! %d\r\n", i++);
-
-	PrintOutputBuffer(OutputBuffer);
-
-	sprintf((char *) OutputBuffer, "Press any key to continue...\r\n");
-
-	PrintOutputBuffer(OutputBuffer);
-
-	keyPress = GetUserInput();
-
-	sprintf((char *) OutputBuffer, "You entered: %c\r\n", keyPress);
-	PrintOutputBuffer(OutputBuffer);
 
     /* USER CODE BEGIN 3 */
   }
