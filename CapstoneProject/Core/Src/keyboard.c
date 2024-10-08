@@ -2,12 +2,14 @@
 
 int column = -1;
 int row = -1;
+char keyPressed = 'm'; //corresponds to no key
 
 char keyMatrix[3][11] = {
     {'s', 'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P'},
     {'e', 'A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', 'd'},
     {'h', 'Z', 'X', 'C', 'V', 'B', 'N', 'M', 'n', 'p', 'm'}
 };
+//s = start, e = end, h = help, d = delete, n = enter, p = space, m is not a key
 
 // Set the control pins based on the channel (binary)
 void setMuxChannel(uint8_t channel)
@@ -96,6 +98,8 @@ int setRowsScanColumns()
 
 void scanKeyboardMatrix()
 {
+	column = -1;
+	row = -1;
 	// scan columns using MUX
 	column = scanColumns();
 
@@ -109,8 +113,16 @@ void scanKeyboardMatrix()
 	if (column != -1 && row != -1){
 		//handle logic
 		printf("Key Press Detected at Row %d, Column %d\n", row, column);
+		keyPressed = keyMatrix[row][column];
+		printf("Key pressed: %c\n", keyPressed);
 		column = -1;
 		row = -1;
+	}
+
+	else
+	{
+		//reduce CPU usage or power consumption
+		HAL_Delay(5);
 	}
 }
 
