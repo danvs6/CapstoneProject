@@ -19,14 +19,14 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "usart.h"
-#include "usb_host.h"
+#include "usb_otg.h"
 #include "gpio.h"
-#include "screen.h"
-#include "keyboard.h"
+
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include <stdio.h>
 #include <stdint.h>
+#include "screen.h"
 
 /* USER CODE END Includes */
 
@@ -37,6 +37,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+#define BUFFER_LENGTH 64 // 16 characters and null terminator
 
 /* USER CODE END PD */
 
@@ -48,14 +49,11 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-uint8_t rx_data;
-uint8_t tx_data[] = "STM32 UART Communication Started\n";
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
-void MX_USB_HOST_Process(void);
-
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -73,6 +71,9 @@ int main(void)
 {
 
   /* USER CODE BEGIN 1 */
+	int i = 0;
+	uint8_t OutputBuffer[BUFFER_LENGTH];
+	uint8_t ReceiveCharacter;
 
   /* USER CODE END 1 */
 
@@ -94,38 +95,53 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
-  MX_USB_HOST_Init();
   MX_USART3_UART_Init();
+  MX_USB_OTG_FS_HCD_Init();
   /* USER CODE BEGIN 2 */
 
   Lcd_PortType ports[] = {
 		LCD_D4_GPIO_Port, LCD_D5_GPIO_Port, LCD_D6_GPIO_Port, LCD_D7_GPIO_Port
 	};
-	Lcd_PinType pins[] = {LCD_D4_Pin, LCD_D5_Pin, LCD_D6_Pin, LCD_D7_Pin};
 
-	// Create LCD handle and initialize it
-	Lcd_HandleTypeDef lcd = Lcd_create(ports, pins, LCD_RS_GPIO_Port, LCD_RS_Pin, LCD_E_GPIO_Port, LCD_E_Pin, LCD_4_BIT_MODE);
+  Lcd_PinType pins[] = {LCD_D4_Pin, LCD_D5_Pin, LCD_D6_Pin, LCD_D7_Pin};
 
-	// Clear the screen before printing
-	Lcd_clear(&lcd);
+  // Create LCD handle and initialize it
+  Lcd_HandleTypeDef lcd = Lcd_create(ports, pins, LCD_RS_GPIO_Port, LCD_RS_Pin, LCD_E_GPIO_Port, LCD_E_Pin, LCD_4_BIT_MODE);
+
+  // Clear the screen before printing
+  Lcd_clear(&lcd);
+  Lcd_string(&lcd, "Enter text:");  // Prompt on the LCD
+
     // Move the cursor to the second line and print a number
     //Lcd_cursor(&lcd, 1, 0);  // Move to second row, first column
     //Lcd_string(&lcd, "drew!!!");
-	HAL_UART_Transmit(&huart3, tx_data, sizeof(tx_data) - 1, HAL_MAX_DELAY);
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+	  // use sprintf() function to print string to be printed to the character buffer, OutputBuffer
+	  sprintf((char *) OutputBuffer, "Hello, world! %d\r\n", i++);
+
+	  // print output buffer via USART
+	  PrintOutputBuffer(OutputBuffer);
+
+	  // generate a prompt
+	  sprintf((char *) OutputBuffer, "Press any key to continue...\r\n");
+	  PrintOutputBuffer(OutputBuffer);
+
+	  // wait for a character
+	  ReceiveCharacter = GetUserInput();
+
+	  // echo character entered
+	  sprintf((char *) OutputBuffer, "You entered: %c\r\n", ReceiveCharacter);
+	  PrintOutputBuffer(OutputBuffer);
+
 
     /* USER CODE END WHILE */
-    //MX_USB_HOST_Process();
-    if (HAL_UART_Receive(&huart3, &rx_data, 1, HAL_MAX_DELAY) == HAL_OK)
-		{
-			// Echo the received character back
-			HAL_UART_Transmit(&huart3, &rx_data, 1, HAL_MAX_DELAY);
-		}
+
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
