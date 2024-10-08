@@ -147,6 +147,21 @@ void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(MEMS_INT2_GPIO_Port, &GPIO_InitStruct);
 
+  GPIO_InitStruct.Pin = GPIO_PIN_8;  // PD8 for TX
+  GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;  // Alternate function push-pull
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+  GPIO_InitStruct.Alternate = GPIO_AF7_USART3;  // AF7 for USART3
+  HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);  // Initialize PD8 as TX
+
+  GPIO_InitStruct.Pin = GPIO_PIN_11;  // PB11 for RX
+  GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;  // Alternate function push-pull
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+  GPIO_InitStruct.Alternate = GPIO_AF7_USART3;  // AF7 for USART3
+  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);  // Initialize PB11 as RX
+
+
 }
 
 /* USER CODE BEGIN 2 */

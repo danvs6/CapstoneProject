@@ -4,7 +4,11 @@
 #include <stdint.h>
 #include <stdio.h>
 #include "gpio.h"
+#include "screen.h"
 
+
+char getMockKeypress();
+void mockScanKeyboardMatrix(Lcd_HandleTypeDef *lcd);
 // Set the control pins based on the channel (binary)
 void setMuxChannel(uint8_t channel);
 
