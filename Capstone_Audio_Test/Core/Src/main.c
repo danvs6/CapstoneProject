@@ -52,7 +52,10 @@ I2S_HandleTypeDef hi2s3;
 DMA_HandleTypeDef hdma_spi3_tx;
 
 /* USER CODE BEGIN PV */
-#define WAV_FILE1 "a.wav" // NEED A SHORT ASS FILENAME (< 8 characters)
+//#define WAV_FILE1 "g.wav" // NEED A SHORT ASS FILENAME (< 8 characters)
+
+#define NUM_FILES 4 // number of wav files
+const char *wavFiles[NUM_FILES] = {"a.wav", "c.wav", "g.wav", "monkey.wav"};
 
 /* USER CODE END PV */
 
@@ -115,7 +118,7 @@ int main(void)
   audioI2S_setHandle(&hi2s3);
 
   bool isSdCardMounted=0;
-  bool pauseResumeToggle=0;
+  //bool pauseResumeToggle=0;
 
   /* USER CODE END 2 */
 
@@ -128,48 +131,89 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
     if(Appli_state == APPLICATION_START){
-    	HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12, GPIO_PIN_SET);
+    	HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12, GPIO_PIN_SET); // Turn on LED when USB application starts
     }
     else if(Appli_state == APPLICATION_DISCONNECT){
     	HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12, GPIO_PIN_RESET);
     }
 
+    // if USB flash drive is connected...
     if(Appli_state == APPLICATION_READY){
     	if(!isSdCardMounted){
-    		f_mount(&USBHFatFS, (const TCHAR*)USBHPath, 0);
+    		f_mount(&USBHFatFS, (const TCHAR*)USBHPath, 0); // Mount the file system on the USB drive
     		isSdCardMounted=1;
     	}
-    	if(HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0)){
-    		HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13, GPIO_PIN_SET);
-    		HAL_Delay(500);
-    		wavPlayer_fileSelect(WAV_FILE1);
-    		wavPlayer_play();
 
-    		while(!wavPlayer_isFinished()){
-    			wavPlayer_process();
-    			if(HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0)){
-    				pauseResumeToggle^=1;
-    				if(pauseResumeToggle){
-    					HAL_GPIO_WritePin(GPIOD, GPIO_PIN_14, GPIO_PIN_SET);
-    					wavPlayer_pause();
-    					HAL_Delay(200);
-    				}
-    				else {
-    					HAL_GPIO_WritePin(GPIOD, GPIO_PIN_14, GPIO_PIN_RESET);
-    					HAL_Delay(1000);
-    					if (HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0)){
-    						wavPlayer_stop();
-    					}
-    					else {
-    					wavPlayer_resume();
-    					}
-    				}
-    			}
-    		}
-    		HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13, GPIO_PIN_RESET);
-    		HAL_Delay(1000);
-    	}
+    	if(HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0)){
+
+			// Iterate through each wav file
+			for (int i = 0; i < NUM_FILES; i++) {
+				HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13, GPIO_PIN_SET); // Turn on LED to indicate button pressed
+				wavPlayer_fileSelect(wavFiles[i]);					 // Select wave file based on name above
+				wavPlayer_play();								     // Play selected wave file
+
+				// wait until the current wav file is finished playing
+				while (!wavPlayer_isFinished()) {
+					wavPlayer_process();
+				}
+
+				// turn off the LED when playback finishes
+				wavPlayer_stop();
+				HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13, GPIO_PIN_RESET); // Turn on LED to indicate playback ended
+
+				// wait for the user to press the pushbutton to begin playing the next file:
+				while (!HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0)) {
+					// wait until the button is pressed
+					HAL_Delay(100);  // debounce delay
+				}
+
+				// wait for the button to be released before proceeding to the next file
+				while (HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0)) {
+					// wait until the button is released
+					HAL_Delay(100);  // debounce delay
+				}
+			}
+		}
     }
+
+//    	// Check if the user button is pressed
+//    	if(HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0)){
+//    		HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13, GPIO_PIN_SET); // Turn on LED to indicate button pressed
+//    		HAL_Delay(500);										 // Debounce delay
+//    		wavPlayer_fileSelect(WAV_FILE1);					 // Select wave file based on name above
+//    		wavPlayer_play();								     // Play selected wave file
+//
+//    		// While the wav player is not finished:
+//    		while(!wavPlayer_isFinished()){
+//    			wavPlayer_process();
+//
+//    			// Check for button press to pause/resume playback
+//    			if(HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0)){
+//    				pauseResumeToggle^=1;						// Toggle pause/resume state
+//    				if(pauseResumeToggle){ // PAUSE
+//    					HAL_GPIO_WritePin(GPIOD, GPIO_PIN_14, GPIO_PIN_SET); // Turn on LED to indicate pause
+//    					wavPlayer_pause();	// Pause audio file
+//    					HAL_Delay(200);
+//    				}
+//    				else {	// RESUME
+//    					HAL_GPIO_WritePin(GPIOD, GPIO_PIN_14, GPIO_PIN_RESET); // Turn off LED to indicate resume
+//    					HAL_Delay(1000);
+//
+//    					// if the button is pressed again during the delay, end the playback
+//    					if (HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0)){
+//    						wavPlayer_stop();	// stop the playback
+//    					}
+//    					else {
+//    					wavPlayer_resume(); // resume if not stopped
+//    					}
+//    				}
+//    			}
+//    		}
+//    		wavPlayer_stop(); // Handles weird noise at end of audio file playback
+//    		HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13, GPIO_PIN_RESET); // Turn off the LED after playback finishes
+//    		HAL_Delay(1000);
+//    	}
+//    }
   }
   /* USER CODE END 3 */
 }

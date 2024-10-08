@@ -1,8 +1,8 @@
 /*
  * audioI2S.c
  *
- *  Created on: 17 Apr 2020
- *      Author: Mohamed Yaqoob
+ *  Created on: 17 September 2024
+ *      Author: Phi Lu
  */
 
 #include "audioI2S.h"
