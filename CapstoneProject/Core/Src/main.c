@@ -18,9 +18,11 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "usart.h"
 #include "usb_host.h"
 #include "gpio.h"
-
+#include "screen.h"
+#include "keyboard.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include <stdio.h>
@@ -46,9 +48,8 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-uint8_t keyPress;
-uint8_t OutputBuffer[64]; // Declare OutputBuffer array
-uint8_t i = 0; // Declare i variable
+uint8_t rx_data;
+uint8_t tx_data[] = "STM32 UART Communication Started\n";
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -94,6 +95,7 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_USB_HOST_Init();
+  MX_USART3_UART_Init();
   /* USER CODE BEGIN 2 */
 
   Lcd_PortType ports[] = {
@@ -109,6 +111,7 @@ int main(void)
     // Move the cursor to the second line and print a number
     //Lcd_cursor(&lcd, 1, 0);  // Move to second row, first column
     //Lcd_string(&lcd, "drew!!!");
+	HAL_UART_Transmit(&huart3, tx_data, sizeof(tx_data) - 1, HAL_MAX_DELAY);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -117,8 +120,12 @@ int main(void)
   {
 
     /* USER CODE END WHILE */
-    MX_USB_HOST_Process();
-
+    //MX_USB_HOST_Process();
+    if (HAL_UART_Receive(&huart3, &rx_data, 1, HAL_MAX_DELAY) == HAL_OK)
+		{
+			// Echo the received character back
+			HAL_UART_Transmit(&huart3, &rx_data, 1, HAL_MAX_DELAY);
+		}
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
