@@ -2,15 +2,10 @@
 #include <string.h>
 #include "keyboard.h"
 #include "screen.h"
-#include "usart.h"
 
 int column = -1;
 int row = -1;
 char keyPressed = 'm'; //corresponds to no key
-
-#define BUFFER_SIZE 64
-char keyBuffer[BUFFER_SIZE] = {0}; // Initialize the buffer
-int bufferIndex = 0; // Current position in the buffer
 
 char keyMatrix[3][11] = {
     {'s', 'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P'},
@@ -18,38 +13,6 @@ char keyMatrix[3][11] = {
     {'h', 'Z', 'X', 'C', 'V', 'B', 'N', 'M', 'n', 'p', 'm'}
 };
 //s = start, e = end, h = help, d = delete, n = enter, p = space, m is not a key
-
-
-void mockScanKeyboardMatrix(Lcd_HandleTypeDef *lcd)
-{
-	// Simulate key press detection using USART input instead of scanning the matrix
-	keyPressed = GetUserInput(); // Get input from the user via USART
-
-	// Ensure the keyPressed corresponds to a valid key in the matrix
-	if (keyPressed != '\0') // Valid input received
-	{
-	    printf("Simulated Key pressed: %c\n", keyPressed);
-
-		// Add key to buffer if space is available
-		if (bufferIndex < BUFFER_SIZE - 1)
-		{
-			keyBuffer[bufferIndex++] = keyPressed;
-			keyBuffer[bufferIndex] = '\0'; // Null-terminate the string
-		}
-
-		// Display the keyBuffer on the LCD
-		Lcd_clear(lcd);
-		Lcd_string(lcd, keyBuffer);
-
-		// Print the buffer content via USART for testing purposes
-		PrintOutputBuffer((uint8_t*)keyBuffer);
-	}
-	else
-	{
-		// No valid key press detected, wait to prevent busy-waiting
-		HAL_Delay(5);
-	}
-}
 
 // Set the control pins based on the channel (binary)
 void setMuxChannel(uint8_t channel)
