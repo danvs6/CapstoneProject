@@ -18,7 +18,6 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-#include "usart.h"
 #include "usb_otg.h"
 #include "gpio.h"
 
@@ -27,6 +26,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include "screen.h"
+#include "keyboard.h"
 
 /* USER CODE END Includes */
 
@@ -71,9 +71,6 @@ int main(void)
 {
 
   /* USER CODE BEGIN 1 */
-	int i = 0;
-	uint8_t OutputBuffer[BUFFER_LENGTH];
-	uint8_t ReceiveCharacter;
 
   /* USER CODE END 1 */
 
@@ -95,12 +92,11 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
-  MX_USART3_UART_Init();
   MX_USB_OTG_FS_HCD_Init();
   /* USER CODE BEGIN 2 */
 
-  Lcd_PortType ports[] = {
-		LCD_D4_GPIO_Port, LCD_D5_GPIO_Port, LCD_D6_GPIO_Port, LCD_D7_GPIO_Port
+  /* Lcd_PortType ports[] = {
+	LCD_D4_GPIO_Port, LCD_D5_GPIO_Port, LCD_D6_GPIO_Port, LCD_D7_GPIO_Port
 	};
 
   Lcd_PinType pins[] = {LCD_D4_Pin, LCD_D5_Pin, LCD_D6_Pin, LCD_D7_Pin};
@@ -116,30 +112,13 @@ int main(void)
     //Lcd_cursor(&lcd, 1, 0);  // Move to second row, first column
     //Lcd_string(&lcd, "drew!!!");
 
+  HAL_Delay(500); /*
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	  // use sprintf() function to print string to be printed to the character buffer, OutputBuffer
-	  sprintf((char *) OutputBuffer, "Hello, world! %d\r\n", i++);
-
-	  // print output buffer via USART
-	  PrintOutputBuffer(OutputBuffer);
-
-	  // generate a prompt
-	  sprintf((char *) OutputBuffer, "Press any key to continue...\r\n");
-	  PrintOutputBuffer(OutputBuffer);
-
-	  // wait for a character
-	  ReceiveCharacter = GetUserInput();
-
-	  // echo character entered
-	  sprintf((char *) OutputBuffer, "You entered: %c\r\n", ReceiveCharacter);
-	  PrintOutputBuffer(OutputBuffer);
-
-
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
