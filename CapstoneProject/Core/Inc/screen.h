@@ -95,7 +95,5 @@ void Lcd_define_char(Lcd_HandleTypeDef * lcd, uint8_t code, uint8_t bitmap[]);
 // clear LCD screen
 void Lcd_clear(Lcd_HandleTypeDef * lcd);
 
-// display pressed keys onto screen
-void displayKeyPress(Lcd_HandleTypeDef * lcd, char pressedKey);
 
 #endif /* INC_SCREEN_H_ */

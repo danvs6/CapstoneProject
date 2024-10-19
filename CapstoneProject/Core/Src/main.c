@@ -52,7 +52,8 @@
 uint8_t columnNumber = 0;
 uint8_t current_row = 0;
 
-int flag = 0; // testing purposes
+int screenColumn = 0;
+int screenRow = 0;
 
 /* USER CODE END PV */
 
@@ -110,16 +111,11 @@ int main(void)
 
   Lcd_PinType pins[] = {LCD_D4_Pin, LCD_D5_Pin, LCD_D6_Pin, LCD_D7_Pin};
 
-  // Create LCD handle and initialize it
+  // Create LCD handle
   Lcd_HandleTypeDef lcd = Lcd_create(ports, pins, LCD_RS_GPIO_Port, LCD_RS_Pin, LCD_E_GPIO_Port, LCD_E_Pin, LCD_4_BIT_MODE);
 
-  // Clear the screen before printing
-  Lcd_clear(&lcd);
-  Lcd_string(&lcd, "Enter text:");  // Prompt on the LCD
-
-    // Move the cursor to the second line and print a number
-    //Lcd_cursor(&lcd, 1, 0);  // Move to second row, first column
-    //Lcd_string(&lcd, "drew!!!");
+  // initialize LCD
+  Lcd_init(&lcd);
 
   // start timer
   if (HAL_TIM_Base_Start_IT(&htim2) != HAL_OK)
@@ -138,10 +134,35 @@ int main(void)
 
 	  if (readMuxInput() == 0)
 	  {
-		  Lcd_cursor(&lcd, 1, 0);  // Move to second row, first column
+		  HAL_Delay(100); // repeat delay, play around with this value
+
 		  char key = handleKeyPress(current_row, columnNumber);
-		  char keyString[2] = { key, '\0' };  // Create a temporary string
-		  Lcd_string(&lcd, keyString);        // Pass the string to Lcd_string
+		  char keyString[2] = { key, '\0' }; // Create a temporary string
+
+		  HAL_Delay(50); // repeat delay
+
+		  Lcd_string(&lcd, keyString); // Display the character
+
+		  if (screenColumn < 16)
+		  {
+			  Lcd_cursor(&lcd, screenRow, screenColumn); // Move cursor to next column
+			  screenColumn++;
+		  }
+
+		  else // row is completely filled
+		  {
+			  screenRow++;
+			  screenColumn = 0; // reset screen column
+
+			  if (screenRow >= 2)     // If both rows are filled (row 2 doesn't exist on a 16x2 display)
+			  {
+				  Lcd_clear(&lcd);    // Clear the display
+				  screenRow = 0;      // Reset to the first row
+				  screenColumn = 0;   // Reset to the first column
+			  }
+
+			  Lcd_cursor(&lcd, screenRow, screenColumn);  // Move cursor to the new position
+		  }
 	  }
 
 	  else
