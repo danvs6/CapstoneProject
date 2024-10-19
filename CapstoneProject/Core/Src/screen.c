@@ -170,5 +170,17 @@ void lcd_write(Lcd_HandleTypeDef * lcd, uint8_t data, uint8_t len)
 	HAL_GPIO_WritePin(lcd->en_port, lcd->en_pin, 0); 		// Data receive on falling edge
 }
 
+// display pressed keys onto screen
+void displayKeyPress(Lcd_HandleTypeDef * lcd, char pressedKey)
+{
+    // Buffer to hold the pressed key as a string
+    char keyStr[2];   // 1 character + null terminator
+    keyStr[0] = pressedKey;   // First element is the pressed key
+    keyStr[1] = '\0';         // Null terminator for the string
+
+    // Display the key on the LCD
+    Lcd_string(lcd, keyStr);  // Call function to print key
+}
+
 
 

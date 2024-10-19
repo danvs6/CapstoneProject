@@ -3,142 +3,43 @@
 #include "keyboard.h"
 #include "screen.h"
 
-int column = -1;
-int row = -1;
-char keyPressed = 'm'; //corresponds to no key
-
-char keyMatrix[3][11] = {
-    {'s', 'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P'},
-    {'e', 'A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', 'd'},
-    {'h', 'Z', 'X', 'C', 'V', 'B', 'N', 'M', 'n', 'p', 'm'}
+// keyboard mapping
+char keyboardMap[3][11] = {
+		{KEY_START, 'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P'}, // row 1
+		{KEY_END, 'A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', KEY_DELETE}, // row 2
+		{KEY_HELP, 'Z', 'X', 'C', 'V', 'B', 'N', 'M', KEY_ENTER, KEY_SPACEBAR} // row 3
 };
-//s = start, e = end, h = help, d = delete, n = enter, p = space, m is not a key
 
 // Set the control pins based on the channel (binary)
 void setMuxChannel(uint8_t channel)
 {
 	// Set S0 and S1 on GPIOC
-	HAL_GPIO_WritePin(S0_PIN_GPIO_Port, S0_PIN_Pin, (channel & 0x01) ? GPIO_PIN_SET : GPIO_PIN_RESET); // checks bit 0
-	HAL_GPIO_WritePin(S1_PIN_GPIO_Port, S1_PIN_Pin, (channel & 0x02) ? GPIO_PIN_SET : GPIO_PIN_RESET); // checks bit 1
+	HAL_GPIO_WritePin(S0_GPIO_Port, S0_Pin, (channel & 0x01) ? SET : RESET); // checks bit 0
+	HAL_GPIO_WritePin(S1_GPIO_Port, S1_Pin, (channel & 0x02) ? SET : RESET); // checks bit 1
 
 	// Set S2 and S3 on GPIOA
-	HAL_GPIO_WritePin(S2_PIN_GPIO_Port, S2_PIN_Pin, (channel & 0x04) ? GPIO_PIN_SET : GPIO_PIN_RESET); // checks bit 2
-	HAL_GPIO_WritePin(S3_PIN_GPIO_Port, S3_PIN_Pin, (channel & 0x08) ? GPIO_PIN_SET : GPIO_PIN_RESET); // checks bit 3
+	HAL_GPIO_WritePin(S2_GPIO_Port, S2_Pin, (channel & 0x04) ? SET : RESET); // checks bit 2
+	HAL_GPIO_WritePin(S3_GPIO_Port, S3_Pin, (channel & 0x08) ? SET : RESET); // checks bit 3
 }
 
-// Function to check the COM pin for a key press (returns 1 if pressed, 0 if not)
+// Function to check the COM pin for a key press (returns 0 if pressed, 1 if not)
 uint8_t readMuxInput()
 {
 	// Read the state of the COM pin (HIGH means no key pressed, LOW means key pressed)
-	return HAL_GPIO_ReadPin(COM_PIN_GPIO_Port, COM_PIN_Pin) == GPIO_PIN_RESET ? 1 : 0;
+	return HAL_GPIO_ReadPin(COM_GPIO_Port, COM_Pin);
 }
 
-// Function to scan MUX channels 0 to 10 and check for key presses
-int scanColumns()
+// get the key press from the keyboard
+char getKeyPressed(uint8_t row, uint8_t col)
 {
-    for (uint8_t column = 0; column < 11; column++)
-    {
-        // Set the MUX to the current column
-        setMuxChannel(column);
-
-        // Check if a key press is detected in this column (COM pin is LOW)
-        if (readMuxInput())
-        {
-            return column;  // Return the column where a key press was detected
-        }
-    }
-
-    return -1; // No key press detected in any column
+    return keyboardMap[row][col];
 }
 
-
-int scanRows()
+// handle key press of each key
+char handleKeyPress(uint8_t row, uint8_t col)
 {
-	// Read each row GPIO pin
-    if (HAL_GPIO_ReadPin(ROW1_PIN_GPIO_Port, ROW1_PIN) == GPIO_PIN_RESET)
-    {
-        return 0; // Row 1 pressed
-    }
-
-    if (HAL_GPIO_ReadPin(ROW2_PIN_GPIO_Port, ROW2_PIN) == GPIO_PIN_RESET)
-    {
-        return 1; // Row 2 pressed
-    }
-
-    if (HAL_GPIO_ReadPin(ROW3_PIN_GPIO_Port, ROW3_PIN) == GPIO_PIN_RESET)
-    {
-        return 2; // Row 3 pressed
-    }
-
-    return -1; // no keypress
+	 char pressedKey = getKeyPressed(row, col);  // Get the key value from keyboard mapping
 }
-
-int setRowsScanColumns()
-{
-	// set rows 1 and 2, check columns corresponding to row 3
-	HAL_GPIO_WritePin(ROW1_PIN_GPIO_Port, ROW1_PIN, GPIO_PIN_SET);
-	HAL_GPIO_WritePin(ROW2_PIN_GPIO_Port, ROW2_PIN, GPIO_PIN_SET);
-	HAL_GPIO_WritePin(ROW3_PIN_GPIO_Port, ROW3_PIN, GPIO_PIN_RESET);
-	if (scanColumns() == column) {
-		return 2;
-	}
-	// set rows 1 and 3, check columns corresponding to row 2
-	HAL_GPIO_WritePin(ROW1_PIN_GPIO_Port, ROW1_PIN, GPIO_PIN_SET);
-	HAL_GPIO_WritePin(ROW2_PIN_GPIO_Port, ROW2_PIN, GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(ROW3_PIN_GPIO_Port, ROW3_PIN, GPIO_PIN_SET);
-	if (scanColumns() == column) {
-		return 1;
-	}
-	// set rows 2 and 3, check columns corresponding to row 1
-	HAL_GPIO_WritePin(ROW1_PIN_GPIO_Port, ROW1_PIN, GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(ROW2_PIN_GPIO_Port, ROW2_PIN, GPIO_PIN_SET);
-	HAL_GPIO_WritePin(ROW3_PIN_GPIO_Port, ROW3_PIN, GPIO_PIN_SET);
-	if (scanColumns() == column) {
-		return 0;
-	}
-	return -1;
-}
-
-void scanKeyboardMatrix(Lcd_HandleTypeDef *lcd)
-{
-	column = -1;
-	row = -1;
-	// scan columns using MUX
-	column = scanColumns();
-
-	if (column != -1)
-	{
-		printf("Key Press Detected in Column %d/n", column);
-		HAL_Delay(5); //prevents debouncing
-		row = setRowsScanColumns();
-	}
-
-	if (column != -1 && row != -1){
-		//handle logic
-		printf("Key Press Detected at Row %d, Column %d\n", row, column);
-		keyPressed = keyMatrix[row][column];
-		printf("Key pressed: %c\n", keyPressed);
-
-		if (bufferIndex < BUFFER_SIZE - 1)
-		{
-			keyBuffer[bufferIndex++] = keyPressed;
-			keyBuffer[bufferIndex] = '\0'; // Null-terminate the string
-		}
-
-		Lcd_clear(lcd);
-		Lcd_string(lcd, keyBuffer);
-
-		column = -1;
-		row = -1;
-	}
-
-	else
-	{
-		//reduce CPU usage or power consumption
-		HAL_Delay(5);
-	}
-}
-
 
 
 

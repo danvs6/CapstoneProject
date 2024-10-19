@@ -18,6 +18,7 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "tim.h"
 #include "usb_otg.h"
 #include "gpio.h"
 
@@ -37,7 +38,6 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define BUFFER_LENGTH 64 // 16 characters and null terminator
 
 /* USER CODE END PD */
 
@@ -49,6 +49,10 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
+uint8_t columnNumber = 0;
+uint8_t current_row = 0;
+
+int flag = 0; // testing purposes
 
 /* USER CODE END PV */
 
@@ -93,9 +97,14 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_USB_OTG_FS_HCD_Init();
+  MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
 
-  /* Lcd_PortType ports[] = {
+  // Turn on Power Switch
+  HAL_GPIO_WritePin(Power_Switch_GPIO_Port, Power_Switch_Pin, SET);
+
+  // Initialize LCD screen
+  Lcd_PortType ports[] = {
 	LCD_D4_GPIO_Port, LCD_D5_GPIO_Port, LCD_D6_GPIO_Port, LCD_D7_GPIO_Port
 	};
 
@@ -108,17 +117,37 @@ int main(void)
   Lcd_clear(&lcd);
   Lcd_string(&lcd, "Enter text:");  // Prompt on the LCD
 
+  // start timer
+  if (HAL_TIM_Base_Start_IT(&htim2) != HAL_OK)
+  {
+	  Error_Handler();
+  }
+
     // Move the cursor to the second line and print a number
     //Lcd_cursor(&lcd, 1, 0);  // Move to second row, first column
     //Lcd_string(&lcd, "drew!!!");
 
-  HAL_Delay(500); /*
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+	  setMuxChannel(columnNumber);
+
+	  if (readMuxInput() == 0)
+	  {
+		  handleKeyPress(current_row, columnNumber);
+	  }
+
+	  else
+	  {
+		  columnNumber++; // increment column number
+
+		  // Move to the next row
+		  current_row = (current_row + 1) % 3;
+	  }
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -172,7 +201,31 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) // 4kHz clock
+{
+	if (htim -> Instance == TIM2) // once timer counts up
+	{
+		// Reset all rows to high
+		HAL_GPIO_WritePin(Y0_GPIO_Port, Y0_Pin, SET);
+		HAL_GPIO_WritePin(Y1_GPIO_Port, Y1_Pin, SET);
+		HAL_GPIO_WritePin(Y2_GPIO_Port, Y2_Pin, SET);
 
+		// Drive the current row low
+		switch (current_row)
+		{
+		case 0:
+			HAL_GPIO_WritePin(Y0_GPIO_Port, Y0_Pin, RESET);
+			break;
+		case 1:
+			HAL_GPIO_WritePin(Y1_GPIO_Port, Y1_Pin, RESET);
+			break;
+		case 2:
+			HAL_GPIO_WritePin(Y2_GPIO_Port, Y2_Pin, RESET);
+			break;
+		}
+
+	}
+}
 /* USER CODE END 4 */
 
 /**
