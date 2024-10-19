@@ -117,15 +117,15 @@ int main(void)
   Lcd_clear(&lcd);
   Lcd_string(&lcd, "Enter text:");  // Prompt on the LCD
 
+    // Move the cursor to the second line and print a number
+    //Lcd_cursor(&lcd, 1, 0);  // Move to second row, first column
+    //Lcd_string(&lcd, "drew!!!");
+
   // start timer
   if (HAL_TIM_Base_Start_IT(&htim2) != HAL_OK)
   {
 	  Error_Handler();
   }
-
-    // Move the cursor to the second line and print a number
-    //Lcd_cursor(&lcd, 1, 0);  // Move to second row, first column
-    //Lcd_string(&lcd, "drew!!!");
 
 
   /* USER CODE END 2 */
@@ -138,12 +138,16 @@ int main(void)
 
 	  if (readMuxInput() == 0)
 	  {
-		  handleKeyPress(current_row, columnNumber);
+		  Lcd_cursor(&lcd, 1, 0);  // Move to second row, first column
+		  char key = handleKeyPress(current_row, columnNumber);
+		  char keyString[2] = { key, '\0' };  // Create a temporary string
+		  Lcd_string(&lcd, keyString);        // Pass the string to Lcd_string
 	  }
 
 	  else
 	  {
-		  columnNumber++; // increment column number
+		  // move to next column
+		  columnNumber = (columnNumber + 1) % 11;
 
 		  // Move to the next row
 		  current_row = (current_row + 1) % 3;
@@ -226,6 +230,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) // 4kHz clock
 
 	}
 }
+
 /* USER CODE END 4 */
 
 /**

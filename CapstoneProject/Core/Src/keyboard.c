@@ -38,7 +38,7 @@ char getKeyPressed(uint8_t row, uint8_t col)
 // handle key press of each key
 char handleKeyPress(uint8_t row, uint8_t col)
 {
-	 char pressedKey = getKeyPressed(row, col);  // Get the key value from keyboard mapping
+	 return getKeyPressed(row, col);  // Get the key value from keyboard mapping
 }
 
 
