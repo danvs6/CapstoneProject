@@ -20,6 +20,8 @@ void setMuxChannel(uint8_t channel);
 // Function to check the COM pin for a key press (returns 1 if pressed, 0 if not); scans columns
 uint8_t readMuxInput();
 
+int detectRow(uint8_t col);
+
 // handle key press of each key
 char handleKeyPress( uint8_t row, uint8_t column);
 

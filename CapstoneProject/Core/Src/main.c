@@ -130,53 +130,92 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	  setMuxChannel(columnNumber);
+	  HAL_GPIO_WritePin(Y0_GPIO_Port, Y0_Pin, GPIO_PIN_RESET);
+	  HAL_GPIO_WritePin(Y1_GPIO_Port, Y1_Pin, GPIO_PIN_RESET);
+	  HAL_GPIO_WritePin(Y2_GPIO_Port, Y2_Pin, GPIO_PIN_RESET);
+      for (columnNumber = 0; columnNumber < 11; columnNumber++)  // Cycle through all columns
+      {
+          setMuxChannel(columnNumber);  // Set the multiplexer to the current column
 
-	  if (readMuxInput() == 0)
-	  {
-		  HAL_Delay(100); // repeat delay, play around with this value
+          // Check if a key is pressed in the current column
+          if (readMuxInput() == 0)  // A 0 indicates a key press in the current column
+          {
+              //HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);  // Toggle an LED to show key press detected
+              HAL_Delay(5); // Debouncing delay
 
-		  char key = handleKeyPress(current_row, columnNumber);
-		  char keyString[2] = { key, '\0' }; // Create a temporary string
+              // Now scan through the rows to detect the correct row
+              for (current_row = 0; current_row < 3; current_row++)
+              {
+                  // Drive the current row low and others high
+                  HAL_GPIO_WritePin(Y0_GPIO_Port, Y0_Pin, (current_row == 0) ? GPIO_PIN_RESET : GPIO_PIN_SET);
+                  HAL_GPIO_WritePin(Y1_GPIO_Port, Y1_Pin, (current_row == 1) ? GPIO_PIN_RESET : GPIO_PIN_SET);
+                  HAL_GPIO_WritePin(Y2_GPIO_Port, Y2_Pin, (current_row == 2) ? GPIO_PIN_RESET : GPIO_PIN_SET);
 
-		  HAL_Delay(50); // repeat delay
+                  // Check if key press still detected
+                  if (readMuxInput() == 0)
+                  {
+                      char key = handleKeyPress(current_row, columnNumber);  // Get key from row/column
+                      char keyString[2] = { key, '\0' };  // Convert to string for LCD display
 
-		  Lcd_string(&lcd, keyString); // Display the character
+                      Lcd_cursor(&lcd, 0, 0);  // Set cursor to top-left corner of the display
+                      Lcd_string(&lcd, keyString);  // Print key to LCD
 
-		  if (screenColumn < 16)
-		  {
-			  Lcd_cursor(&lcd, screenRow, screenColumn); // Move cursor to next column
-			  screenColumn++;
-		  }
-
-		  else // row is completely filled
-		  {
-			  screenRow++;
-			  screenColumn = 0; // reset screen column
-
-			  if (screenRow >= 2)     // If both rows are filled (row 2 doesn't exist on a 16x2 display)
-			  {
-				  Lcd_clear(&lcd);    // Clear the display
-				  screenRow = 0;      // Reset to the first row
-				  screenColumn = 0;   // Reset to the first column
-			  }
-
-			  Lcd_cursor(&lcd, screenRow, screenColumn);  // Move cursor to the new position
-		  }
-	  }
-
-	  else
-	  {
-		  // move to next column
-		  columnNumber = (columnNumber + 1) % 11;
-
-		  // Move to the next row
-		  current_row = (current_row + 1) % 3;
-	  }
-    /* USER CODE END WHILE */
-
-    /* USER CODE BEGIN 3 */
+                      HAL_Delay(5);  // Short delay so the output is visible
+                      break;  // Exit the loop after detecting the key press
+                  }
+              }
+          }
+      }
   }
+
+//  while (1)
+//  {
+//	  // Set the correct multiplexer channel for the current column
+//	  setMuxChannel(columnNumber);
+//
+//	  // Check if a key is pressed in the current column
+//	  if (readMuxInput() == 0)
+//	  {
+//		  HAL_Delay(100); // Debouncing delay
+//
+//		  // Get the corresponding key press
+//		  char key = handleKeyPress(current_row, columnNumber);
+//		  char keyString[2] = { key, '\0' }; // Convert to string for LCD display
+//
+//		  HAL_Delay(50); // Short delay to allow the character to register
+//
+//		  // Display the key on the LCD
+//		  Lcd_string(&lcd, keyString);
+//
+//		  // Move to the next position on the screen
+//		  if (screenColumn < 16)  // 16 characters per row
+//		  {
+//			  Lcd_cursor(&lcd, screenRow, screenColumn); // Move cursor
+//			  screenColumn++;
+//		  }
+//		  else
+//		  {
+//			  screenRow++;
+//			  screenColumn = 0; // Reset to column 0
+//
+//			  // If both rows are filled, clear the screen
+//			  if (screenRow >= 2)
+//			  {
+//				  Lcd_clear(&lcd);    // Clear display
+//				  screenRow = 0;      // Reset to first row
+//			  }
+//
+//			  Lcd_cursor(&lcd, screenRow, screenColumn);  // Move cursor to new row
+//		  }
+//	  }
+//
+//	  // Scan through all columns after checking the current one
+//	  columnNumber = (columnNumber + 1) % 11;
+//	  current_row = (current_row + 1) % 3;  // Move to the next row in a cyclic manner
+//  }
+  /* USER CODE END WHILE */
+
+  /* USER CODE BEGIN 3 */
   /* USER CODE END 3 */
 }
 
