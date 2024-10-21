@@ -55,6 +55,8 @@ uint8_t current_row = 0;
 int screenColumn = 0;
 int screenRow = 0;
 
+Lcd_HandleTypeDef lcd;
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -112,7 +114,7 @@ int main(void)
   Lcd_PinType pins[] = {LCD_D4_Pin, LCD_D5_Pin, LCD_D6_Pin, LCD_D7_Pin};
 
   // Create LCD handle
-  Lcd_HandleTypeDef lcd = Lcd_create(ports, pins, LCD_RS_GPIO_Port, LCD_RS_Pin, LCD_E_GPIO_Port, LCD_E_Pin, LCD_4_BIT_MODE);
+  lcd = Lcd_create(ports, pins, LCD_RS_GPIO_Port, LCD_RS_Pin, LCD_E_GPIO_Port, LCD_E_Pin, LCD_4_BIT_MODE);
 
   // initialize LCD
   Lcd_init(&lcd);
@@ -132,47 +134,53 @@ int main(void)
   {
 	  setMuxChannel(columnNumber);
 
-	  if (readMuxInput() == 0)
-	  {
-		  HAL_Delay(100); // repeat delay, play around with this value
+	  // move to next column
+	  columnNumber = (columnNumber + 1) % 11;
 
-		  char key = handleKeyPress(current_row, columnNumber);
-		  char keyString[2] = { key, '\0' }; // Create a temporary string
+	  // Move to the next row
+	  current_row = (current_row + 1) % 3;
 
-		  HAL_Delay(50); // repeat delay
-
-		  Lcd_string(&lcd, keyString); // Display the character
-
-		  if (screenColumn < 16)
-		  {
-			  Lcd_cursor(&lcd, screenRow, screenColumn); // Move cursor to next column
-			  screenColumn++;
-		  }
-
-		  else // row is completely filled
-		  {
-			  screenRow++;
-			  screenColumn = 0; // reset screen column
-
-			  if (screenRow >= 2)     // If both rows are filled (row 2 doesn't exist on a 16x2 display)
-			  {
-				  Lcd_clear(&lcd);    // Clear the display
-				  screenRow = 0;      // Reset to the first row
-				  screenColumn = 0;   // Reset to the first column
-			  }
-
-			  Lcd_cursor(&lcd, screenRow, screenColumn);  // Move cursor to the new position
-		  }
-	  }
-
-	  else
-	  {
-		  // move to next column
-		  columnNumber = (columnNumber + 1) % 11;
-
-		  // Move to the next row
-		  current_row = (current_row + 1) % 3;
-	  }
+//	  if (readMuxInput() == 0)
+//	  {
+//		  HAL_Delay(100); // repeat delay, play around with this value
+//
+//		  char key = handleKeyPress(current_row, columnNumber);
+//		  char keyString[2] = { key, '\0' }; // Create a temporary string
+//
+//		  HAL_Delay(50); // repeat delay
+//
+//		  Lcd_string(&lcd, keyString); // Display the character
+//
+//		  if (screenColumn < 16)
+//		  {
+//			  Lcd_cursor(&lcd, screenRow, screenColumn); // Move cursor to next column
+//			  screenColumn++;
+//		  }
+//
+//		  else // row is completely filled
+//		  {
+//			  screenRow++;
+//			  screenColumn = 0; // reset screen column
+//
+//			  if (screenRow >= 2)     // If both rows are filled (row 2 doesn't exist on a 16x2 display)
+//			  {
+//				  Lcd_clear(&lcd);    // Clear the display
+//				  screenRow = 0;      // Reset to the first row
+//				  screenColumn = 0;   // Reset to the first column
+//			  }
+//
+//			  Lcd_cursor(&lcd, screenRow, screenColumn);  // Move cursor to the new position
+//		  }
+//	  }
+//
+//	  else
+//	  {
+//		  // move to next column
+//		  columnNumber = (columnNumber + 1) % 11;
+//
+//		  // Move to the next row
+//		  current_row = (current_row + 1) % 3;
+//	  }
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -249,6 +257,35 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) // 4kHz clock
 			break;
 		}
 
+	}
+}
+
+void HAL_GPIO_EXTI_Rising_Callback(uint16_t GPIO_Pin)
+{
+	char key = handleKeyPress(current_row, columnNumber);
+	char keyString[2] = { key, '\0' }; // Create a temporary string
+
+	Lcd_string(&lcd, keyString); // Display the character
+
+	if (screenColumn < 16)
+	{
+		Lcd_cursor(&lcd, screenRow, screenColumn); // Move cursor to next column
+		screenColumn++;
+	}
+
+	else // row is completely filled
+	{
+		screenRow++;
+		screenColumn = 0; // reset screen column
+
+		if (screenRow >= 2)     // If both rows are filled (row 2 doesn't exist on a 16x2 display)
+		{
+			Lcd_clear(&lcd);    // Clear the display
+			screenRow = 0;      // Reset to the first row
+			screenColumn = 0;   // Reset to the first column
+		}
+
+		Lcd_cursor(&lcd, screenRow, screenColumn);  // Move cursor to the new position
 	}
 }
 

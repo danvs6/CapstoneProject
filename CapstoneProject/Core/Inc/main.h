@@ -109,6 +109,7 @@ void Error_Handler(void);
 #define S3_GPIO_Port GPIOC
 #define COM_Pin GPIO_PIN_8
 #define COM_GPIO_Port GPIOA
+#define COM_EXTI_IRQn EXTI9_5_IRQn
 #define VBUS_FS_Pin GPIO_PIN_9
 #define VBUS_FS_GPIO_Port GPIOA
 #define OTG_FS_ID_Pin GPIO_PIN_10
