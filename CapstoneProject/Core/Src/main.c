@@ -260,7 +260,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) // 4kHz clock
 	}
 }
 
-void HAL_GPIO_EXTI_Rising_Callback(uint16_t GPIO_Pin)
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
 	char key = handleKeyPress(current_row, columnNumber);
 	char keyString[2] = { key, '\0' }; // Create a temporary string
