@@ -26,6 +26,10 @@
 #include "audioI2S.h"
 #include "MY_CS43L22.h"
 #include "wav_player.h"
+#include <stdlib.h>
+#include <time.h>
+#include <string.h>
+
 
 /* USER CODE END Includes */
 
@@ -51,11 +55,18 @@ I2C_HandleTypeDef hi2c1;
 I2S_HandleTypeDef hi2s3;
 DMA_HandleTypeDef hdma_spi3_tx;
 
-/* USER CODE BEGIN PV */
-//#define WAV_FILE1 "g.wav" // NEED A SHORT ASS FILENAME (< 8 characters)
+RNG_HandleTypeDef hrng;
 
-#define NUM_FILES 4 // number of wav files
-const char *wavFiles[NUM_FILES] = {"a.wav", "c.wav", "g.wav", "monkey.wav"};
+/* USER CODE BEGIN PV */
+
+#define NUM_FILES 10 // number of wav files
+// char *wavFiles[NUM_FILES] = {"1.wav", "2.wav", "3.wav", "4.wav", "5.wav", "6.wav", "7.wav", "8.wav", "9.wav", "10.wav"};
+
+
+// more memory efficient method:
+// #define NUM_FILES 100
+#define MAX_WORD_LENGTH 32 // buffer size
+uint8_t fileIndices[NUM_FILES]; // use list of integers instead of strings
 
 /* USER CODE END PV */
 
@@ -65,6 +76,7 @@ static void MX_GPIO_Init(void);
 static void MX_DMA_Init(void);
 static void MX_I2C1_Init(void);
 static void MX_I2S3_Init(void);
+static void MX_RNG_Init(void);
 void MX_USB_HOST_Process(void);
 
 /* USER CODE BEGIN PFP */
@@ -73,6 +85,47 @@ void MX_USB_HOST_Process(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+
+// space for .wav and .txt
+char wavFileName[16];
+char txtFileName[16];
+
+char expectedWord[MAX_WORD_LENGTH];
+char userInput[MAX_WORD_LENGTH];
+
+// Generate 100 integers
+void initializeIndices(uint8_t *array, int n) {
+	for (uint8_t i = 0; i < n; i++) {
+		array[i] = i+1;
+	}
+}
+
+// Fisher-Yates shuffle for randomizing array of wav files
+void fisherYatesShuffle(uint8_t *array, int n) {
+	for (int i = n-1; i > 0; i--) {
+		uint32_t randomNumber;
+
+		if (HAL_RNG_GenerateRandomNumber(&hrng, &randomNumber) != HAL_OK) {
+			randomNumber = 0;
+		}
+
+		int j = randomNumber % (i+1); // generate a random index between 0 and i
+
+		// swap array[j] with array[i]
+		uint8_t temp = array[i];
+		array[i] = array[j];
+		array[j] = temp;
+	}
+}
+
+/* ***NEED:  a function that reads from the .txt file */
+
+
+/* ***NEED:  a function that gets the user input from the keyboard */
+
+
+/* ***NEED:  a function that compares the word read from the .txt file and the user input */
+
 
 /* USER CODE END 0 */
 
@@ -110,15 +163,15 @@ int main(void)
   MX_I2S3_Init();
   MX_USB_HOST_Init();
   MX_FATFS_Init();
+  MX_RNG_Init();
   /* USER CODE BEGIN 2 */
   CS43_Init(hi2c1, MODE_I2S);
-  CS43_SetVolume(255); //he changed it from the set api, this goes from 0-255
+  CS43_SetVolume(255); // this goes from 0-255
   CS43_Enable_RightLeft(CS43_RIGHT_LEFT);
 
   audioI2S_setHandle(&hi2s3);
 
   bool isSdCardMounted=0;
-  //bool pauseResumeToggle=0;
 
   /* USER CODE END 2 */
 
@@ -142,15 +195,23 @@ int main(void)
     	if(!isSdCardMounted){
     		f_mount(&USBHFatFS, (const TCHAR*)USBHPath, 0); // Mount the file system on the USB drive
     		isSdCardMounted=1;
+
+    		// generate integers and shuffle before first one plays
+    		initializeIndices(fileIndices, NUM_FILES);
+    		fisherYatesShuffle(fileIndices, NUM_FILES);
     	}
 
     	if(HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0)){
-
 			// Iterate through each wav file
 			for (int i = 0; i < NUM_FILES; i++) {
 				HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13, GPIO_PIN_SET); // Turn on LED to indicate button pressed
-				wavPlayer_fileSelect(wavFiles[i]);					 // Select wave file based on name above
-				wavPlayer_play();								     // Play selected wave file
+
+				// generate the file names
+				snprintf(wavFileName, sizeof(wavFileName), "%d.wav", fileIndices[i]);
+				snprintf(txtFileName, sizeof(txtFileName), "%d.txt", fileIndices[i]);
+
+				wavPlayer_fileSelect(wavFileName);					 // Select wav file based on name above
+				wavPlayer_play();								     // Play selected wav file
 
 				// wait until the current wav file is finished playing
 				while (!wavPlayer_isFinished()) {
@@ -159,64 +220,36 @@ int main(void)
 
 				// turn off the LED when playback finishes
 				wavPlayer_stop();
+
 				HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13, GPIO_PIN_RESET); // Turn on LED to indicate playback ended
 
+				// *** NEED: 1.) read from the text file using the function above
+				//           2.) get the user input using the function above
+				//           3.) compare the user input and the word using the function above
+				//           4.) trigger a feedback mechanism (LED?)
+
 				// wait for the user to press the pushbutton to begin playing the next file:
+				// (this simulates waiting until the user types in the correct word to move on)
+
+				// **IMPLEMENTATION DESIGN for waiting till user gets proper word**
+
+
+				//
+
 				while (!HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0)) {
 					// wait until the button is pressed
 					HAL_Delay(100);  // debounce delay
 				}
-
-				// wait for the button to be released before proceeding to the next file
-				while (HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0)) {
-					// wait until the button is released
-					HAL_Delay(100);  // debounce delay
-				}
 			}
+
+			// shuffle the audio files after each full playback sequence
+			fisherYatesShuffle(fileIndices, NUM_FILES);
 		}
     }
-
-//    	// Check if the user button is pressed
-//    	if(HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0)){
-//    		HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13, GPIO_PIN_SET); // Turn on LED to indicate button pressed
-//    		HAL_Delay(500);										 // Debounce delay
-//    		wavPlayer_fileSelect(WAV_FILE1);					 // Select wave file based on name above
-//    		wavPlayer_play();								     // Play selected wave file
-//
-//    		// While the wav player is not finished:
-//    		while(!wavPlayer_isFinished()){
-//    			wavPlayer_process();
-//
-//    			// Check for button press to pause/resume playback
-//    			if(HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0)){
-//    				pauseResumeToggle^=1;						// Toggle pause/resume state
-//    				if(pauseResumeToggle){ // PAUSE
-//    					HAL_GPIO_WritePin(GPIOD, GPIO_PIN_14, GPIO_PIN_SET); // Turn on LED to indicate pause
-//    					wavPlayer_pause();	// Pause audio file
-//    					HAL_Delay(200);
-//    				}
-//    				else {	// RESUME
-//    					HAL_GPIO_WritePin(GPIOD, GPIO_PIN_14, GPIO_PIN_RESET); // Turn off LED to indicate resume
-//    					HAL_Delay(1000);
-//
-//    					// if the button is pressed again during the delay, end the playback
-//    					if (HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0)){
-//    						wavPlayer_stop();	// stop the playback
-//    					}
-//    					else {
-//    					wavPlayer_resume(); // resume if not stopped
-//    					}
-//    				}
-//    			}
-//    		}
-//    		wavPlayer_stop(); // Handles weird noise at end of audio file playback
-//    		HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13, GPIO_PIN_RESET); // Turn off the LED after playback finishes
-//    		HAL_Delay(1000);
-//    	}
-//    }
   }
-  /* USER CODE END 3 */
 }
+
+  /* USER CODE END 3 */
 
 /**
   * @brief System Clock Configuration
@@ -328,6 +361,32 @@ static void MX_I2S3_Init(void)
   /* USER CODE BEGIN I2S3_Init 2 */
 
   /* USER CODE END I2S3_Init 2 */
+
+}
+
+/**
+  * @brief RNG Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_RNG_Init(void)
+{
+
+  /* USER CODE BEGIN RNG_Init 0 */
+
+  /* USER CODE END RNG_Init 0 */
+
+  /* USER CODE BEGIN RNG_Init 1 */
+
+  /* USER CODE END RNG_Init 1 */
+  hrng.Instance = RNG;
+  if (HAL_RNG_Init(&hrng) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN RNG_Init 2 */
+
+  /* USER CODE END RNG_Init 2 */
 
 }
 
