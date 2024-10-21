@@ -18,7 +18,6 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-#include "tim.h"
 #include "usb_otg.h"
 #include "gpio.h"
 
@@ -98,7 +97,6 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_USB_OTG_FS_HCD_Init();
-  MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
 
   // Turn on Power Switch
@@ -117,28 +115,23 @@ int main(void)
   // initialize LCD
   Lcd_init(&lcd);
 
-  // start timer
-  if (HAL_TIM_Base_Start_IT(&htim2) != HAL_OK)
-  {
-	  Error_Handler();
-  }
-
-
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+	  // initially set all rows low
 	  HAL_GPIO_WritePin(Y0_GPIO_Port, Y0_Pin, GPIO_PIN_RESET);
 	  HAL_GPIO_WritePin(Y1_GPIO_Port, Y1_Pin, GPIO_PIN_RESET);
 	  HAL_GPIO_WritePin(Y2_GPIO_Port, Y2_Pin, GPIO_PIN_RESET);
+
       for (columnNumber = 0; columnNumber < 11; columnNumber++)  // Cycle through all columns
       {
           setMuxChannel(columnNumber);  // Set the multiplexer to the current column
 
           // Check if a key is pressed in the current column
-          if (readMuxInput() == 0)  // A 0 indicates a key press in the current column
+          if (readMuxInput() == 0)  // 0 indicates a key press in the current column
           {
               //HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);  // Toggle an LED to show key press detected
               HAL_Delay(5); // Debouncing delay
@@ -157,10 +150,33 @@ int main(void)
                       char key = handleKeyPress(current_row, columnNumber);  // Get key from row/column
                       char keyString[2] = { key, '\0' };  // Convert to string for LCD display
 
-                      Lcd_cursor(&lcd, 0, 0);  // Set cursor to top-left corner of the display
+                      //Lcd_cursor(&lcd, 0, 0);  // Set cursor to top-left corner of the display
                       Lcd_string(&lcd, keyString);  // Print key to LCD
 
                       HAL_Delay(5);  // Short delay so the output is visible
+
+                      // Move to the next position on the screen
+                      if (screenColumn < 16)  // 16 characters per row
+                      {
+                    	  Lcd_cursor(&lcd, screenRow, screenColumn); // Move cursor
+                    	  screenColumn++;
+                      }
+
+                      else
+                      {
+                    	  screenRow++;
+                    	  screenColumn = 0; // Reset to column 0
+
+                    	  // If both rows are filled, clear the screen
+                    	  if (screenRow >= 2)
+                    	  {
+                    		  Lcd_clear(&lcd);    // Clear display
+                    		  screenRow = 0;      // Reset to first row
+                    	  }
+
+                    	  Lcd_cursor(&lcd, screenRow, screenColumn);  // Move cursor to new row
+                      }
+
                       break;  // Exit the loop after detecting the key press
                   }
               }
@@ -213,9 +229,9 @@ int main(void)
 //	  columnNumber = (columnNumber + 1) % 11;
 //	  current_row = (current_row + 1) % 3;  // Move to the next row in a cyclic manner
 //  }
-  /* USER CODE END WHILE */
+    /* USER CODE END WHILE */
 
-  /* USER CODE BEGIN 3 */
+    /* USER CODE BEGIN 3 */
   /* USER CODE END 3 */
 }
 
@@ -265,31 +281,6 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
-void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) // 4kHz clock
-{
-	if (htim -> Instance == TIM2) // once timer counts up
-	{
-		// Reset all rows to high
-		HAL_GPIO_WritePin(Y0_GPIO_Port, Y0_Pin, SET);
-		HAL_GPIO_WritePin(Y1_GPIO_Port, Y1_Pin, SET);
-		HAL_GPIO_WritePin(Y2_GPIO_Port, Y2_Pin, SET);
-
-		// Drive the current row low
-		switch (current_row)
-		{
-		case 0:
-			HAL_GPIO_WritePin(Y0_GPIO_Port, Y0_Pin, RESET);
-			break;
-		case 1:
-			HAL_GPIO_WritePin(Y1_GPIO_Port, Y1_Pin, RESET);
-			break;
-		case 2:
-			HAL_GPIO_WritePin(Y2_GPIO_Port, Y2_Pin, RESET);
-			break;
-		}
-
-	}
-}
 
 /* USER CODE END 4 */
 
