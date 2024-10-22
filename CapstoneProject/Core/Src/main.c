@@ -18,6 +18,7 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "tim.h"
 #include "usb_otg.h"
 #include "gpio.h"
 
@@ -48,6 +49,7 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
+TIM_HandleTypeDef htim2;
 uint8_t columnNumber = 0;
 uint8_t current_row = 0;
 
@@ -97,6 +99,7 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_USB_OTG_FS_HCD_Init();
+  MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
 
   // Turn on Power Switch
@@ -115,6 +118,11 @@ int main(void)
   // initialize LCD
   Lcd_init(&lcd);
 
+  if (HAL_TIM_Base_Start_IT(&htim2) != HAL_OK)
+  {
+	  Error_Handler();
+  }
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -126,6 +134,8 @@ int main(void)
 	  HAL_GPIO_WritePin(Y1_GPIO_Port, Y1_Pin, GPIO_PIN_RESET);
 	  HAL_GPIO_WritePin(Y2_GPIO_Port, Y2_Pin, GPIO_PIN_RESET);
 
+	  HAL_Delay(2);
+
       for (columnNumber = 0; columnNumber < 11; columnNumber++)  // Cycle through all columns
       {
           setMuxChannel(columnNumber);  // Set the multiplexer to the current column
@@ -133,9 +143,6 @@ int main(void)
           // Check if a key is pressed in the current column
           if (readMuxInput() == 0)  // 0 indicates a key press in the current column
           {
-              //HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);  // Toggle an LED to show key press detected
-              HAL_Delay(5); // Debouncing delay
-
               // Now scan through the rows to detect the correct row
               for (current_row = 0; current_row < 3; current_row++)
               {
@@ -143,6 +150,8 @@ int main(void)
                   HAL_GPIO_WritePin(Y0_GPIO_Port, Y0_Pin, (current_row == 0) ? GPIO_PIN_RESET : GPIO_PIN_SET);
                   HAL_GPIO_WritePin(Y1_GPIO_Port, Y1_Pin, (current_row == 1) ? GPIO_PIN_RESET : GPIO_PIN_SET);
                   HAL_GPIO_WritePin(Y2_GPIO_Port, Y2_Pin, (current_row == 2) ? GPIO_PIN_RESET : GPIO_PIN_SET);
+
+                  HAL_Delay(1); // change HAL delay value in future
 
                   // Check if key press still detected
                   if (readMuxInput() == 0)
@@ -153,7 +162,7 @@ int main(void)
                       //Lcd_cursor(&lcd, 0, 0);  // Set cursor to top-left corner of the display
                       Lcd_string(&lcd, keyString);  // Print key to LCD
 
-                      HAL_Delay(5);  // Short delay so the output is visible
+                      HAL_Delay(1);  // Short delay so the output is visible; D10, 21, 8, 19
 
                       // Move to the next position on the screen
                       if (screenColumn < 16)  // 16 characters per row
@@ -281,6 +290,13 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+{
+	if (htim -> Instance == TIM2)
+	{
+
+	}
+}
 
 /* USER CODE END 4 */
 
