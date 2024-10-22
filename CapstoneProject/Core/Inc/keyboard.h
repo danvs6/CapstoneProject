@@ -29,4 +29,6 @@ char handleKeyPress( uint8_t row, uint8_t column);
 // readjust rows due to clock cycle
 uint8_t rowReadjustment(uint8_t current_row);
 
+void scanKeyboard(Lcd_HandleTypeDef *lcd, int *screenRow, int *screenColumn);
+
 #endif /* INC_KEYBOARD_H_ */

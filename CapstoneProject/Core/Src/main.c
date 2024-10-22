@@ -130,57 +130,7 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-      for (columnNumber = 0; columnNumber < 11; columnNumber++)  // Cycle through all columns
-      {
-          setMuxChannel(columnNumber);  // Set the multiplexer to the current column
-
-          // Check if a key is pressed in the current column
-          if (readMuxInput() == 0)  // 0 indicates a key press in the current column
-          {
-              HAL_Delay(1); // Short delay for debouncing
-
-              // Check if key press is still detected after debounce
-              if (readMuxInput() == 0)
-              {
-                  keyDetected = 1;
-
-                  // readjust row due to clock
-                  current_row = rowReadjustment(current_row);
-
-                  // Register the key press
-                  char key = handleKeyPress(current_row, columnNumber);  // Get key from row/column
-
-                  if (key == KEY_DELETE)
-                  {
-                	  deletePreviousChar(&lcd, &screenRow, &screenColumn);
-                  }
-
-                  else if (key == KEY_SPACEBAR)
-                  {
-                	  moveCursor(&lcd, &screenRow, &screenColumn);
-                  }
-
-                  else
-                  {
-                	  char keyString[2] = {key, '\0'};  // Convert to string for LCD display
-
-                	  // Display the key on the LCD
-                	  Lcd_string(&lcd, keyString);
-
-                	  moveCursor(&lcd, &screenRow, &screenColumn);
-                  }
-
-                  // Wait for key release before continuing
-                  while (readMuxInput() == 0)
-                  {
-                      HAL_Delay(5);  // Small delay to avoid excessive checking and CPU usage
-                  }
-
-                  keyDetected = 0;
-                  break;  // Exit the column loop after registering one key press
-              }
-          }
-      }
+	  scanKeyboard(&lcd, &screenRow, &screenColumn);
   }
 
     /* USER CODE END WHILE */

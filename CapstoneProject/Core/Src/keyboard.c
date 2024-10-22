@@ -2,6 +2,13 @@
 #include <string.h>
 #include "keyboard.h"
 #include "screen.h"
+#include "gpio.h"
+#include "tim.h"
+
+// External variables from main.c
+extern uint8_t columnNumber;
+extern uint8_t current_row;
+extern int keyDetected;
 
 // keyboard mapping
 char keyboardMap[3][11] = {
@@ -55,6 +62,57 @@ uint8_t rowReadjustment(uint8_t current_row)
     }
 
     return current_row;
+}
+
+// Function to scan the keyboard matrix
+void scanKeyboard(Lcd_HandleTypeDef *lcd, int *screenRow, int *screenColumn)
+{
+    for (columnNumber = 0; columnNumber < 11; columnNumber++)  // Cycle through all columns
+    {
+        setMuxChannel(columnNumber);  // Set the multiplexer to the current column
+
+        // Check if a key is pressed in the current column
+        if (readMuxInput() == 0)  // 0 indicates a key press in the current column
+        {
+            HAL_Delay(1); // Short delay for debouncing
+
+            // Check if key press is still detected after debounce
+            if (readMuxInput() == 0)
+            {
+                keyDetected = 1;
+
+                // readjust row due to clock
+                current_row = rowReadjustment(current_row);
+
+                // Register the key press
+                char key = handleKeyPress(current_row, columnNumber);  // Get key from row/column
+
+                if (key == KEY_DELETE)
+                {
+                    deletePreviousChar(lcd, screenRow, screenColumn);
+                }
+                else if (key == KEY_SPACEBAR)
+                {
+                    moveCursor(lcd, screenRow, screenColumn);
+                }
+                else
+                {
+                    char keyString[2] = {key, '\0'};  // Convert to string for LCD display
+                    Lcd_string(lcd, keyString);
+                    moveCursor(lcd, screenRow, screenColumn);
+                }
+
+                // Wait for key release before continuing
+                while (readMuxInput() == 0)
+                {
+                    HAL_Delay(5);  // Small delay to avoid excessive checking and CPU usage
+                }
+
+                keyDetected = 0;
+                break;  // Exit the column loop after registering one key press
+            }
+        }
+    }
 }
 
 
