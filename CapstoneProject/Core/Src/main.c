@@ -49,13 +49,13 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-TIM_HandleTypeDef htim2;
 uint8_t columnNumber = 0;
 uint8_t current_row = 0;
 
 int screenColumn = 0;
 int screenRow = 0;
 
+int keyDetected = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -129,13 +129,6 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	  // initially set all rows low
-	  HAL_GPIO_WritePin(Y0_GPIO_Port, Y0_Pin, GPIO_PIN_RESET);
-	  HAL_GPIO_WritePin(Y1_GPIO_Port, Y1_Pin, GPIO_PIN_RESET);
-	  HAL_GPIO_WritePin(Y2_GPIO_Port, Y2_Pin, GPIO_PIN_RESET);
-
-	  HAL_Delay(2);
-
       for (columnNumber = 0; columnNumber < 11; columnNumber++)  // Cycle through all columns
       {
           setMuxChannel(columnNumber);  // Set the multiplexer to the current column
@@ -143,101 +136,45 @@ int main(void)
           // Check if a key is pressed in the current column
           if (readMuxInput() == 0)  // 0 indicates a key press in the current column
           {
-              // Now scan through the rows to detect the correct row
-              for (current_row = 0; current_row < 3; current_row++)
-              {
-                  // Drive the current row low and others high
-                  HAL_GPIO_WritePin(Y0_GPIO_Port, Y0_Pin, (current_row == 0) ? GPIO_PIN_RESET : GPIO_PIN_SET);
-                  HAL_GPIO_WritePin(Y1_GPIO_Port, Y1_Pin, (current_row == 1) ? GPIO_PIN_RESET : GPIO_PIN_SET);
-                  HAL_GPIO_WritePin(Y2_GPIO_Port, Y2_Pin, (current_row == 2) ? GPIO_PIN_RESET : GPIO_PIN_SET);
+        	  HAL_Delay(1); // change HAL delay value in future
 
-                  HAL_Delay(1); // change HAL delay value in future
+        	  // Check if key press still detected
+        	  if (readMuxInput() == 0)
+        	  {
+        		  keyDetected = 1;
+        		  char key = handleKeyPress(current_row, columnNumber);  // Get key from row/column
+        		  char keyString[2] = { key, '\0' };  // Convert to string for LCD display
 
-                  // Check if key press still detected
-                  if (readMuxInput() == 0)
-                  {
-                      char key = handleKeyPress(current_row, columnNumber);  // Get key from row/column
-                      char keyString[2] = { key, '\0' };  // Convert to string for LCD display
+        		  //Lcd_cursor(&lcd, 0, 0);  // Set cursor to top-left corner of the display
+        		  Lcd_string(&lcd, keyString);  // Print key to LCD
 
-                      //Lcd_cursor(&lcd, 0, 0);  // Set cursor to top-left corner of the display
-                      Lcd_string(&lcd, keyString);  // Print key to LCD
+        		  // Move to the next position on the screen
+        		  if (screenColumn < 16)  // 16 characters per row
+        		  {
+        			  Lcd_cursor(&lcd, screenRow, screenColumn); // Move cursor
+        			  screenColumn++;
+        		  }
 
-                      HAL_Delay(1);  // Short delay so the output is visible; D10, 21, 8, 19
+        		  else
+        		  {
+        			  screenRow++;
+        			  screenColumn = 0; // Reset to column 0
 
-                      // Move to the next position on the screen
-                      if (screenColumn < 16)  // 16 characters per row
-                      {
-                    	  Lcd_cursor(&lcd, screenRow, screenColumn); // Move cursor
-                    	  screenColumn++;
-                      }
+        			  // If both rows are filled, clear the screen
+        			  if (screenRow >= 2)
+        			  {
+        				  Lcd_clear(&lcd);    // Clear display
+        				  screenRow = 0;      // Reset to first row
+        			  }
 
-                      else
-                      {
-                    	  screenRow++;
-                    	  screenColumn = 0; // Reset to column 0
-
-                    	  // If both rows are filled, clear the screen
-                    	  if (screenRow >= 2)
-                    	  {
-                    		  Lcd_clear(&lcd);    // Clear display
-                    		  screenRow = 0;      // Reset to first row
-                    	  }
-
-                    	  Lcd_cursor(&lcd, screenRow, screenColumn);  // Move cursor to new row
-                      }
-
-                      break;  // Exit the loop after detecting the key press
-                  }
-              }
+        			  Lcd_cursor(&lcd, screenRow, screenColumn);  // Move cursor to new row
+        		  }
+        	  }
+        	  keyDetected = 0;
+        	  break;
           }
       }
   }
-
-//  while (1)
-//  {
-//	  // Set the correct multiplexer channel for the current column
-//	  setMuxChannel(columnNumber);
-//
-//	  // Check if a key is pressed in the current column
-//	  if (readMuxInput() == 0)
-//	  {
-//		  HAL_Delay(100); // Debouncing delay
-//
-//		  // Get the corresponding key press
-//		  char key = handleKeyPress(current_row, columnNumber);
-//		  char keyString[2] = { key, '\0' }; // Convert to string for LCD display
-//
-//		  HAL_Delay(50); // Short delay to allow the character to register
-//
-//		  // Display the key on the LCD
-//		  Lcd_string(&lcd, keyString);
-//
-//		  // Move to the next position on the screen
-//		  if (screenColumn < 16)  // 16 characters per row
-//		  {
-//			  Lcd_cursor(&lcd, screenRow, screenColumn); // Move cursor
-//			  screenColumn++;
-//		  }
-//		  else
-//		  {
-//			  screenRow++;
-//			  screenColumn = 0; // Reset to column 0
-//
-//			  // If both rows are filled, clear the screen
-//			  if (screenRow >= 2)
-//			  {
-//				  Lcd_clear(&lcd);    // Clear display
-//				  screenRow = 0;      // Reset to first row
-//			  }
-//
-//			  Lcd_cursor(&lcd, screenRow, screenColumn);  // Move cursor to new row
-//		  }
-//	  }
-//
-//	  // Scan through all columns after checking the current one
-//	  columnNumber = (columnNumber + 1) % 11;
-//	  current_row = (current_row + 1) % 3;  // Move to the next row in a cyclic manner
-//  }
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -290,11 +227,30 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
-void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) // 4 kHz clock
 {
-	if (htim -> Instance == TIM2)
+	if (htim -> Instance == TIM2 && keyDetected == 0)
 	{
+		// Reset all rows to high
+		HAL_GPIO_WritePin(Y0_GPIO_Port, Y0_Pin, SET);
+		HAL_GPIO_WritePin(Y1_GPIO_Port, Y1_Pin, SET);
+		HAL_GPIO_WritePin(Y2_GPIO_Port, Y2_Pin, SET);
 
+		// Drive the current row low
+		switch (current_row)
+		{
+		case 0:
+			HAL_GPIO_WritePin(Y0_GPIO_Port, Y0_Pin, RESET);
+			break;
+		case 1:
+			HAL_GPIO_WritePin(Y1_GPIO_Port, Y1_Pin, RESET);
+			break;
+		case 2:
+			HAL_GPIO_WritePin(Y2_GPIO_Port, Y2_Pin, RESET);
+			break;
+		}
+
+		current_row = (current_row + 1) % 3;
 	}
 }
 
