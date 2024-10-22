@@ -136,12 +136,24 @@ int main(void)
           // Check if a key is pressed in the current column
           if (readMuxInput() == 0)  // 0 indicates a key press in the current column
           {
-        	  HAL_Delay(1); // change HAL delay value in future
+        	  HAL_Delay(7); // change HAL delay value in future
 
         	  // Check if key press still detected
         	  if (readMuxInput() == 0)
         	  {
+        		  HAL_Delay(7); // change HAL delay value in future
+
         		  keyDetected = 1;
+
+        		  if (current_row == 2)
+        		  {
+        			  current_row = 0;
+        		  }
+        		  else
+        		  {
+        			  current_row++;
+        		  }
+
         		  char key = handleKeyPress(current_row, columnNumber);  // Get key from row/column
         		  char keyString[2] = { key, '\0' };  // Convert to string for LCD display
 
@@ -170,6 +182,7 @@ int main(void)
         			  Lcd_cursor(&lcd, screenRow, screenColumn);  // Move cursor to new row
         		  }
         	  }
+
         	  keyDetected = 0;
         	  break;
           }
