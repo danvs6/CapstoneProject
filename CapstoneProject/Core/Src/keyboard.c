@@ -42,6 +42,22 @@ char handleKeyPress(uint8_t row, uint8_t col)
 }
 
 
+// readjust rows due to clock cycle
+uint8_t rowReadjustment(uint8_t current_row)
+{
+    if (current_row == 0)
+    {
+        current_row = 2;  // If current row is 0, wrap around to 2
+    }
+
+    else
+    {
+        current_row -= 1;  // Otherwise, decrement the row
+    }
+
+    return current_row;
+}
+
 
 
 

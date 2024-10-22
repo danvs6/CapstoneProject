@@ -95,5 +95,7 @@ void Lcd_define_char(Lcd_HandleTypeDef * lcd, uint8_t code, uint8_t bitmap[]);
 // clear LCD screen
 void Lcd_clear(Lcd_HandleTypeDef * lcd);
 
+// move cursor
+void moveCursor(Lcd_HandleTypeDef *lcd, int *screenRow, int *screenColumn);
 
 #endif /* INC_SCREEN_H_ */

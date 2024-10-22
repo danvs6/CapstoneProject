@@ -118,6 +118,7 @@ int main(void)
   // initialize LCD
   Lcd_init(&lcd);
 
+  // start timer
   if (HAL_TIM_Base_Start_IT(&htim2) != HAL_OK)
   {
 	  Error_Handler();
@@ -143,12 +144,8 @@ int main(void)
               {
                   keyDetected = 1;
 
-                  // Handle row increment logic
-                  if (current_row == 0) {
-                      current_row = 2;
-                  } else {
-                      current_row -= 1;
-                  }
+                  // readjust row due to clock
+                  current_row = rowReadjustment(current_row);
 
                   // Register the key press
                   char key = handleKeyPress(current_row, columnNumber);  // Get key from row/column
@@ -157,26 +154,7 @@ int main(void)
                   // Display the key on the LCD
                   Lcd_string(&lcd, keyString);
 
-                  // Move to the next position on the screen
-                  if (screenColumn < 16)  // 16 characters per row
-                  {
-                      Lcd_cursor(&lcd, screenRow, screenColumn);  // Move cursor
-                      screenColumn++;
-                  }
-                  else
-                  {
-                      screenRow++;
-                      screenColumn = 0;  // Reset to column 0
-
-                      // If both rows are filled, clear the screen
-                      if (screenRow >= 2)
-                      {
-                          Lcd_clear(&lcd);  // Clear display
-                          screenRow = 0;    // Reset to first row
-                      }
-
-                      Lcd_cursor(&lcd, screenRow, screenColumn);  // Move cursor to new row
-                  }
+                  moveCursor(&lcd, &screenRow, &screenColumn);
 
                   // Wait for key release before continuing
                   while (readMuxInput() == 0)
@@ -184,7 +162,6 @@ int main(void)
                       HAL_Delay(5);  // Small delay to avoid excessive checking and CPU usage
                   }
 
-                  // Reset keyDetected flag after release
                   keyDetected = 0;
                   break;  // Exit the column loop after registering one key press
               }
@@ -267,7 +244,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) // 4 kHz clock
 			break;
 		}
 
-		current_row = (current_row + 1) % 3;
+		current_row = (current_row + 1) % 3; // update current row
 	}
 }
 

@@ -112,6 +112,31 @@ void Lcd_define_char(Lcd_HandleTypeDef * lcd, uint8_t code, uint8_t bitmap[])
 
 }
 
+// move cursor
+void moveCursor(Lcd_HandleTypeDef *lcd, int *screenRow, int *screenColumn)
+{
+    // Move to the next position on the screen
+    if (*screenColumn < 16)  // 16 characters per row
+    {
+        Lcd_cursor(lcd, *screenRow, *screenColumn);  // Move cursor
+        (*screenColumn)++;  // Increment column
+    }
+    else
+    {
+        (*screenRow)++;  // Move to the next row
+        *screenColumn = 0;  // Reset to column 0
+
+        // If both rows are filled, clear the screen
+        if (*screenRow >= 2)
+        {
+            Lcd_clear(lcd);  // Clear display
+            *screenRow = 0;  // Reset to first row
+        }
+
+        Lcd_cursor(lcd, *screenRow, *screenColumn);  // Move cursor to the new row
+    }
+}
+
 
 /************************************** Static function definition **************************************/
 
