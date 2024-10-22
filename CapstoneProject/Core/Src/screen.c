@@ -118,7 +118,7 @@ void moveCursor(Lcd_HandleTypeDef *lcd, int *screenRow, int *screenColumn)
     // Move to the next position on the screen
     if (*screenColumn < 16)  // 16 characters per row
     {
-        Lcd_cursor(lcd, *screenRow, *screenColumn);  // Move cursor
+        Lcd_cursor(lcd, *screenRow, *screenColumn); // Move cursor
         (*screenColumn)++;  // Increment column
     }
     else
@@ -136,6 +136,31 @@ void moveCursor(Lcd_HandleTypeDef *lcd, int *screenRow, int *screenColumn)
         Lcd_cursor(lcd, *screenRow, *screenColumn);  // Move cursor to the new row
     }
 }
+
+void deletePreviousChar(Lcd_HandleTypeDef *lcd, int *screenRow, int *screenColumn)
+{
+    // If we're not at the start of a row, just move back one column
+    if (*screenColumn > 0)
+    {
+        (*screenColumn)--;  // Move to the previous column
+    }
+    // If we're at the start of a row, move to the end of the previous row
+    else if (*screenRow > 0)
+    {
+        (*screenRow)--;  // Move to the previous row
+        *screenColumn = 15;  // Set the column to the last column (15) of the previous row
+    }
+
+    // Set the cursor to the new position
+    Lcd_cursor(lcd, *screenRow, *screenColumn);
+
+    // Replace the character with a space (delete it visually)
+    Lcd_string(lcd, " ");
+
+    // Move the cursor back to the deleted character's position
+    Lcd_cursor(lcd, *screenRow, *screenColumn);
+}
+
 
 
 /************************************** Static function definition **************************************/

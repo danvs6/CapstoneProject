@@ -149,12 +149,26 @@ int main(void)
 
                   // Register the key press
                   char key = handleKeyPress(current_row, columnNumber);  // Get key from row/column
-                  char keyString[2] = {key, '\0'};  // Convert to string for LCD display
 
-                  // Display the key on the LCD
-                  Lcd_string(&lcd, keyString);
+                  if (key == KEY_DELETE)
+                  {
+                	  deletePreviousChar(&lcd, &screenRow, &screenColumn);
+                  }
 
-                  moveCursor(&lcd, &screenRow, &screenColumn);
+                  else if (key == KEY_SPACEBAR)
+                  {
+                	  moveCursor(&lcd, &screenRow, &screenColumn);
+                  }
+
+                  else
+                  {
+                	  char keyString[2] = {key, '\0'};  // Convert to string for LCD display
+
+                	  // Display the key on the LCD
+                	  Lcd_string(&lcd, keyString);
+
+                	  moveCursor(&lcd, &screenRow, &screenColumn);
+                  }
 
                   // Wait for key release before continuing
                   while (readMuxInput() == 0)

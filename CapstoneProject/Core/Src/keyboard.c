@@ -41,7 +41,6 @@ char handleKeyPress(uint8_t row, uint8_t col)
 	 return getKeyPressed(row, col);  // Get the key value from keyboard mapping
 }
 
-
 // readjust rows due to clock cycle
 uint8_t rowReadjustment(uint8_t current_row)
 {
