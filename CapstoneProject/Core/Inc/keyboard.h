@@ -25,5 +25,9 @@ int detectRow(uint8_t col);
 // handle key press of each key
 char handleKeyPress( uint8_t row, uint8_t column);
 
+uint8_t debounce(uint8_t reading);
+
+char scanKeyboard();
+
 
 #endif /* INC_KEYBOARD_H_ */

@@ -136,58 +136,62 @@ int main(void)
           // Check if a key is pressed in the current column
           if (readMuxInput() == 0)  // 0 indicates a key press in the current column
           {
-        	  HAL_Delay(7); // change HAL delay value in future
+              HAL_Delay(1); // Short delay for debouncing
 
-        	  // Check if key press still detected
-        	  if (readMuxInput() == 0)
-        	  {
-        		  HAL_Delay(7); // change HAL delay value in future
+              // Check if key press is still detected after debounce
+              if (readMuxInput() == 0)
+              {
+                  keyDetected = 1;
 
-        		  keyDetected = 1;
+                  // Handle row increment logic
+                  if (current_row == 0) {
+                      current_row = 2;
+                  } else {
+                      current_row -= 1;
+                  }
 
-        		  if (current_row == 2)
-        		  {
-        			  current_row = 0;
-        		  }
-        		  else
-        		  {
-        			  current_row++;
-        		  }
+                  // Register the key press
+                  char key = handleKeyPress(current_row, columnNumber);  // Get key from row/column
+                  char keyString[2] = {key, '\0'};  // Convert to string for LCD display
 
-        		  char key = handleKeyPress(current_row, columnNumber);  // Get key from row/column
-        		  char keyString[2] = { key, '\0' };  // Convert to string for LCD display
+                  // Display the key on the LCD
+                  Lcd_string(&lcd, keyString);
 
-        		  //Lcd_cursor(&lcd, 0, 0);  // Set cursor to top-left corner of the display
-        		  Lcd_string(&lcd, keyString);  // Print key to LCD
+                  // Move to the next position on the screen
+                  if (screenColumn < 16)  // 16 characters per row
+                  {
+                      Lcd_cursor(&lcd, screenRow, screenColumn);  // Move cursor
+                      screenColumn++;
+                  }
+                  else
+                  {
+                      screenRow++;
+                      screenColumn = 0;  // Reset to column 0
 
-        		  // Move to the next position on the screen
-        		  if (screenColumn < 16)  // 16 characters per row
-        		  {
-        			  Lcd_cursor(&lcd, screenRow, screenColumn); // Move cursor
-        			  screenColumn++;
-        		  }
+                      // If both rows are filled, clear the screen
+                      if (screenRow >= 2)
+                      {
+                          Lcd_clear(&lcd);  // Clear display
+                          screenRow = 0;    // Reset to first row
+                      }
 
-        		  else
-        		  {
-        			  screenRow++;
-        			  screenColumn = 0; // Reset to column 0
+                      Lcd_cursor(&lcd, screenRow, screenColumn);  // Move cursor to new row
+                  }
 
-        			  // If both rows are filled, clear the screen
-        			  if (screenRow >= 2)
-        			  {
-        				  Lcd_clear(&lcd);    // Clear display
-        				  screenRow = 0;      // Reset to first row
-        			  }
+                  // Wait for key release before continuing
+                  while (readMuxInput() == 0)
+                  {
+                      HAL_Delay(5);  // Small delay to avoid excessive checking and CPU usage
+                  }
 
-        			  Lcd_cursor(&lcd, screenRow, screenColumn);  // Move cursor to new row
-        		  }
-        	  }
-
-        	  keyDetected = 0;
-        	  break;
+                  // Reset keyDetected flag after release
+                  keyDetected = 0;
+                  break;  // Exit the column loop after registering one key press
+              }
           }
       }
   }
+
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
