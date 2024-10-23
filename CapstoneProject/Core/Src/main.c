@@ -132,36 +132,7 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	  for (columnNumber = 0; columnNumber < 11; columnNumber++) // Cycle through all columns
-	      {
-	          setMuxChannel(columnNumber);  // Set the multiplexer to the current column
-
-	          // Check if a key is pressed in the current column
-	          if (readMuxInput() == 0) // 0 indicates a key press in the current column
-	          {
-	              HAL_Delay(1); // Short delay for debouncing
-
-	              // Check if key press is still detected after debounce
-	              if (readMuxInput() == 0)
-	              {
-	                  keyDetected = 1; // stops timer from iterating through rows
-
-	                  // readjust row due to clock
-	                  current_row = rowReadjustment(current_row);
-
-	                  // Register the key press
-	                  char key = getKeyPressed(current_row, columnNumber);  // Get key from row/column
-
-	                  processKeyPress(key, &lcd, &screenRow, &screenColumn);
-
-	                  // stall until key is released; avoid key repetition
-	                  while (readMuxInput() == 0);
-
-	                  keyDetected = 0;
-	                  break;
-	              }
-	          }
-	      }
+	  scanKeyboard(&lcd, &screenRow, &screenColumn);
   }
     /* USER CODE END WHILE */
 

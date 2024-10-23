@@ -30,6 +30,6 @@ void processKeyPress(char key, Lcd_HandleTypeDef *lcd, int *screenRow, int *scre
 uint8_t rowReadjustment(uint8_t current_row);
 
 
-char scanKeyboard(Lcd_HandleTypeDef *lcd, int *screenRow, int *screenColumn);
+void scanKeyboard(Lcd_HandleTypeDef *lcd, int *screenRow, int *screenColumn);
 
 #endif /* INC_KEYBOARD_H_ */

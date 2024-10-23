@@ -80,6 +80,40 @@ uint8_t rowReadjustment(uint8_t current_row)
     return current_row;
 }
 
+void scanKeyboard(Lcd_HandleTypeDef *lcd, int *screenRow, int *screenColumn){
+	for (columnNumber = 0; columnNumber < 11; columnNumber++)  // Cycle through all columns
+	{
+		setMuxChannel(columnNumber);  // Set the multiplexer to the current column
+
+		// Check if a key is pressed in the current column
+		if (readMuxInput() == 0)  // 0 indicates a key press in the current column
+		{
+			HAL_Delay(1);  // Short delay for debouncing
+
+			// Check if key press is still detected after debounce
+			if (readMuxInput() == 0)
+			{
+				keyDetected = 1;  // Stop the timer from iterating through rows
+
+				// Adjust the row due to the clock
+				current_row = rowReadjustment(current_row);
+
+				// Register the key press
+				char key = getKeyPressed(current_row, columnNumber);  // Get key from row/column
+
+				// Process the key press
+				processKeyPress(key, lcd, screenRow, screenColumn);
+
+				// Wait until the key is released to avoid key repetition
+				while (readMuxInput() == 0);
+
+				// Reset keyDetected after the key is released
+				keyDetected = 0;
+				break;
+			}
+		}
+	}
+}
 
 
 
