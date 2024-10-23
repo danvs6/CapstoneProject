@@ -49,7 +49,8 @@ char getKeyPressed(uint8_t row, uint8_t col)
 // handle key press of each key
 void processKeyPress(char key, Lcd_HandleTypeDef *lcd, int *screenRow, int *screenColumn)
 {
-	if(started){
+	if(started)
+	{
 		switch (key)
 		{
 			case KEY_DELETE:
@@ -138,7 +139,9 @@ void processKeyPress(char key, Lcd_HandleTypeDef *lcd, int *screenRow, int *scre
 			}
 		}
 	}
-	else{
+
+	else
+	{
 		if(key == KEY_START)
 		{
 			started = 1;
@@ -168,6 +171,7 @@ uint8_t rowReadjustment(uint8_t current_row)
     return current_row;
 }
 
+// keyboard matrix scanner
 void scanKeyboard(Lcd_HandleTypeDef *lcd, int *screenRow, int *screenColumn){
 	for (columnNumber = 0; columnNumber < 11; columnNumber++)  // Cycle through all columns
 	{
