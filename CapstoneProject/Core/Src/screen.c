@@ -115,25 +115,27 @@ void Lcd_define_char(Lcd_HandleTypeDef * lcd, uint8_t code, uint8_t bitmap[])
 // move cursor
 void moveCursor(Lcd_HandleTypeDef *lcd, int *screenRow, int *screenColumn)
 {
-	// Move to the next position on the screen
-	if (*screenColumn < 15)  // 16 characters per row, column index 0-15
-	{
-		(*screenColumn)++;  // Move to the next column
-	}
-	else
-	{
-		(*screenRow)++;  // Move to the next row
-		*screenColumn = 0;  // Reset column to 0 for the new row
+    if (*screenColumn < 15)  // Column index 0-15
+    {
+        (*screenColumn)++;  // Move to the next column
+    }
+    else
+    {
+        // Move to the next row only if you're on row 0
+        if (*screenRow < 1)
+        {
+            (*screenRow)++;
+            *screenColumn = 0;  // Reset column to 0 for the new row
+        }
+        else
+        {
+            *screenRow = 1;  // Stay on the last row (row 1)
+            *screenColumn = 15;  // Stay at the last column (column 15)
+        }
+    }
 
-		if (*screenRow >= 2)  // For 2-row LCDs, reset to row 0 if past the last row
-		{
-			Lcd_clear(lcd);
-			*screenRow = 0;  // Reset to row 0
-		}
-	}
-
-	// Set the new cursor position on the LCD
-	Lcd_cursor(lcd, *screenRow, *screenColumn);
+    // Set the new cursor position on the LCD
+    Lcd_cursor(lcd, *screenRow, *screenColumn);
 }
 
 void deletePreviousChar(Lcd_HandleTypeDef *lcd, int *screenRow, int *screenColumn)

@@ -28,6 +28,7 @@
 #include <stdint.h>
 #include "screen.h"
 #include "keyboard.h"
+#include "ESLApplication.h"
 
 /* USER CODE END Includes */
 
@@ -55,9 +56,8 @@ int screenColumn = 0;
 int screenRow = 0;
 int keyDetected = 0;
 
-char word[32] = "";  // Global word buffer with space for 50 characters
-uint8_t wordIndex = 0;  // Track the position in the word
-char current_key = '\0';
+char current_word[32] = "";  // Global word buffer with space for 32 characters
+char expected_word[32] = "HELLO";
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/

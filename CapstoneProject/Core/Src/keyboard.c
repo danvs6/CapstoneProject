@@ -4,11 +4,14 @@
 #include "screen.h"
 #include "gpio.h"
 #include "tim.h"
+#include "ESLApplication.h"
 
 // External variables from main.c
 extern uint8_t columnNumber;
 extern uint8_t current_row;
 extern int keyDetected;
+extern char current_word[32];
+extern char expected_word[32];
 
 // keyboard mapping
 char keyboardMap[3][11] = {
@@ -45,22 +48,87 @@ char getKeyPressed(uint8_t row, uint8_t col)
 // handle key press of each key
 void processKeyPress(char key, Lcd_HandleTypeDef *lcd, int *screenRow, int *screenColumn)
 {
-	// Handle special keys first
-	if (key == KEY_DELETE)
-	{
-		deletePreviousChar(lcd, screenRow, screenColumn);
-	}
-
-	else if (key == KEY_SPACEBAR)
-	{
-		moveCursor(lcd, screenRow, screenColumn);
-	}
-
-    else
+    switch (key)
     {
-        char keyString[2] = {key, '\0'};  // Convert to string for LCD display
-        Lcd_string(lcd, keyString);
-        moveCursor(lcd, screenRow, screenColumn);
+        case KEY_DELETE:
+        {
+            // Remove the last character from the word
+            size_t len = strlen(current_word);
+            if (len > 0)
+            {
+                current_word[len - 1] = '\0';  // Remove the last character
+            }
+            deletePreviousChar(lcd, screenRow, screenColumn);  // Update display
+            break;
+        }
+
+        case KEY_SPACEBAR:
+        {
+            // Add space if there's room in current_word and on the screen
+            size_t len = strlen(current_word);
+            if (len < sizeof(current_word) - 1 && (*screenRow < 2 && *screenColumn <= 15))  // Allow up to 32 characters
+            {
+                current_word[len] = ' ';  // Add space
+                current_word[len + 1] = '\0';  // Null-terminate
+                moveCursor(lcd, screenRow, screenColumn);  // Move cursor forward
+            }
+            break;
+        }
+
+        case KEY_ENTER:
+        {
+            // Check if the typed word matches the expected word
+            if (strcmp(current_word, expected_word) == 0)
+            {
+                Lcd_clear(lcd);  // Clear the display
+                processSpecialKey(key, 1);  // Handle successful ENTER key press
+                (*screenRow) = 0;
+                (*screenColumn) = 0;
+                moveCursor(lcd, 0,0); //move cursor to first position
+                memset(current_word, 0, sizeof(current_word));  // Reset current_word to empty
+            }
+            else
+            {
+                // Handle incorrect entry
+                processSpecialKey(key, 0);
+            }
+            break;
+        }
+
+        case KEY_START:
+        {
+        	processSpecialKey(key, 1);
+        	break;
+        }
+
+        case KEY_END:
+		{
+			processSpecialKey(key, 1);
+			break;
+		}
+
+        case KEY_HELP:
+		{
+			processSpecialKey(key, 1);
+			break;
+		}
+
+        default:
+        {
+            // Add regular key to current_word, if there's space in current_word and on the screen
+            size_t len = strlen(current_word);
+            if (len < sizeof(current_word) - 1 && (*screenRow < 2 && *screenColumn <= 15))  // Allow up to 32 characters
+            {
+                current_word[len] = key;
+                current_word[len + 1] = '\0';  // Null-terminate
+
+                // Display the key on the LCD
+                char keyString[2] = {key, '\0'};  // Convert to string for LCD display
+                Lcd_string(lcd, keyString);  // Display the character
+                moveCursor(lcd, screenRow, screenColumn);  // Move cursor forward
+            }
+            break;
+        }
     }
 }
 
