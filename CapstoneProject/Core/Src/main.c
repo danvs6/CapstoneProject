@@ -132,15 +132,6 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-//	  current_key = scanKeyboard(&lcd, &screenRow, &screenColumn);
-//
-//	      if (current_key != '\0')
-//	      {
-//	          // Process the current key (already handled in scanKeyboard)
-//	          // Reset keyDetected after processing if needed
-//	          keyDetected = 0;  // Reset this to allow further scans once the key is processed
-//	      }
-//  }
 	  for (columnNumber = 0; columnNumber < 11; columnNumber++) // Cycle through all columns
 	      {
 	          setMuxChannel(columnNumber);  // Set the multiplexer to the current column
