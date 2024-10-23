@@ -57,6 +57,7 @@ int screenRow = 0;
 int keyDetected = 0;
 
 char current_word[32] = "";  // Global word buffer with space for 32 characters
+//PRESS ENTER WITH EXPECTED WORD AND IT DELETES
 char expected_word[32] = "HELLO";
 /* USER CODE END PV */
 
@@ -119,6 +120,10 @@ int main(void)
 
   // initialize LCD
   Lcd_init(&lcd);
+  Lcd_cursor(&lcd, 0, 0);  // Set cursor to the first row, first column
+  Lcd_string(&lcd, "Presione 'Start'");  // Display "Press" on the first row
+  Lcd_cursor(&lcd, 1, 0);  // Set cursor to the second row, first column
+  Lcd_string(&lcd, "para comenzar");  // Display "Start" on the second row
 
   // start timer
   if (HAL_TIM_Base_Start_IT(&htim2) != HAL_OK)

@@ -10,4 +10,19 @@
 
 void processSpecialKey(char key, int correct);
 
+//initializations
+void startApplication();
+
+//end
+void endApplication();
+
+//help user
+void handleHelpFunction();
+
+//handling for correct word entered
+void handleCorrectWord();
+
+//handling for incorrect word entered
+void handleIncorrectWord();
+
 #endif /* INC_ESLAPPLICATION_H_ */
