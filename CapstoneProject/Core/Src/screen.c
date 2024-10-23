@@ -127,6 +127,7 @@ void moveCursor(Lcd_HandleTypeDef *lcd, int *screenRow, int *screenColumn)
 
 		if (*screenRow >= 2)  // For 2-row LCDs, reset to row 0 if past the last row
 		{
+			Lcd_clear(lcd);
 			*screenRow = 0;  // Reset to row 0
 		}
 	}

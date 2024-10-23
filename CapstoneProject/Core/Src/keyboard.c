@@ -65,7 +65,7 @@ uint8_t rowReadjustment(uint8_t current_row)
 }
 
 // Function to scan the keyboard matrix
-void scanKeyboard(Lcd_HandleTypeDef *lcd, int *screenRow, int *screenColumn)
+char scanKeyboard(Lcd_HandleTypeDef *lcd, int *screenRow, int *screenColumn)
 {
     for (columnNumber = 0; columnNumber < 11; columnNumber++)  // Cycle through all columns
     {
@@ -109,10 +109,11 @@ void scanKeyboard(Lcd_HandleTypeDef *lcd, int *screenRow, int *screenColumn)
                 }
 
                 keyDetected = 0;
-                break;  // Exit the column loop after registering one key press
+                return key;
             }
         }
     }
+    return '\0';
 }
 
 
