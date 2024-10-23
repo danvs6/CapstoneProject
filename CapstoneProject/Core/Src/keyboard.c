@@ -43,9 +43,25 @@ char getKeyPressed(uint8_t row, uint8_t col)
 }
 
 // handle key press of each key
-char handleKeyPress(uint8_t row, uint8_t col)
+void processKeyPress(char key, Lcd_HandleTypeDef *lcd, int *screenRow, int *screenColumn)
 {
-	 return getKeyPressed(row, col);  // Get the key value from keyboard mapping
+	// Handle special keys first
+	if (key == KEY_DELETE)
+	{
+		deletePreviousChar(lcd, screenRow, screenColumn);
+	}
+
+	else if (key == KEY_SPACEBAR)
+	{
+		moveCursor(lcd, screenRow, screenColumn);
+	}
+
+    else
+    {
+        char keyString[2] = {key, '\0'};  // Convert to string for LCD display
+        Lcd_string(lcd, keyString);
+        moveCursor(lcd, screenRow, screenColumn);
+    }
 }
 
 // readjust rows due to clock cycle
@@ -58,63 +74,63 @@ uint8_t rowReadjustment(uint8_t current_row)
 
     else
     {
-        current_row -= 1;  // Otherwise, decrement the row
+        current_row --;  // Otherwise, decrement the row
     }
 
     return current_row;
 }
 
 // Function to scan the keyboard matrix
-char scanKeyboard(Lcd_HandleTypeDef *lcd, int *screenRow, int *screenColumn)
-{
-    for (columnNumber = 0; columnNumber < 11; columnNumber++)  // Cycle through all columns
-    {
-        setMuxChannel(columnNumber);  // Set the multiplexer to the current column
-
-        // Check if a key is pressed in the current column
-        if (readMuxInput() == 0)  // 0 indicates a key press in the current column
-        {
-            HAL_Delay(1); // Short delay for debouncing
-
-            // Check if key press is still detected after debounce
-            if (readMuxInput() == 0)
-            {
-                keyDetected = 1;
-
-                // readjust row due to clock
-                current_row = rowReadjustment(current_row);
-
-                // Register the key press
-                char key = handleKeyPress(current_row, columnNumber);  // Get key from row/column
-
-                if (key == KEY_DELETE)
-                {
-                    deletePreviousChar(lcd, screenRow, screenColumn);
-                }
-                else if (key == KEY_SPACEBAR)
-                {
-                    moveCursor(lcd, screenRow, screenColumn);
-                }
-                else
-                {
-                    char keyString[2] = {key, '\0'};  // Convert to string for LCD display
-                    Lcd_string(lcd, keyString);
-                    moveCursor(lcd, screenRow, screenColumn);
-                }
-
-                // Wait for key release before continuing
-                while (readMuxInput() == 0)
-                {
-                    HAL_Delay(5);  // Small delay to avoid excessive checking and CPU usage
-                }
-
-                keyDetected = 0;
-                return key;
-            }
-        }
-    }
-    return '\0';
-}
+//char scanKeyboard(Lcd_HandleTypeDef *lcd, int *screenRow, int *screenColumn)
+//{
+//    for (columnNumber = 0; columnNumber < 11; columnNumber++)  // Cycle through all columns
+//    {
+//        setMuxChannel(columnNumber);  // Set the multiplexer to the current column
+//
+//        // Check if a key is pressed in the current column
+//        if (readMuxInput() == 0)  // 0 indicates a key press in the current column
+//        {
+//            HAL_Delay(1); // Short delay for debouncing
+//
+//            // Check if key press is still detected after debounce
+//            if (readMuxInput() == 0)
+//            {
+//                keyDetected = 1;
+//
+//                // readjust row due to clock
+//                current_row = rowReadjustment(current_row);
+//
+//                // Register the key press
+//                char key = processKeyPress(current_row, columnNumber);  // Get key from row/column
+//
+//                if (key == KEY_DELETE)
+//                {
+//                    deletePreviousChar(lcd, screenRow, screenColumn);
+//                }
+//                else if (key == KEY_SPACEBAR)
+//                {
+//                    moveCursor(lcd, screenRow, screenColumn);
+//                }
+//                else
+//                {
+//                    char keyString[2] = {key, '\0'};  // Convert to string for LCD display
+//                    Lcd_string(lcd, keyString);
+//                    moveCursor(lcd, screenRow, screenColumn);
+//                }
+//
+//                // Wait for key release before continuing
+//                while (readMuxInput() == 0)
+//                {
+//                    HAL_Delay(5);  // Small delay to avoid excessive checking and CPU usage
+//                }
+//
+//                keyDetected = 0;
+//                return key;
+//            }
+//        }
+//    }
+//    return '\0';
+//}
 
 
 

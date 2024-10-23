@@ -24,10 +24,11 @@ uint8_t readMuxInput();
 char getKeyPressed(uint8_t row, uint8_t col);
 
 // handle key press of each key
-char handleKeyPress( uint8_t row, uint8_t column);
+void processKeyPress(char key, Lcd_HandleTypeDef *lcd, int *screenRow, int *screenColumn);
 
 // readjust rows due to clock cycle
 uint8_t rowReadjustment(uint8_t current_row);
+
 
 char scanKeyboard(Lcd_HandleTypeDef *lcd, int *screenRow, int *screenColumn);
 
