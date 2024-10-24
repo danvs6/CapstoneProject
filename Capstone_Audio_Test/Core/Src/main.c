@@ -119,7 +119,36 @@ void fisherYatesShuffle(uint8_t *array, int n) {
 }
 
 /* ***NEED:  a function that reads from the .txt file */
+int readWordFromFile(const char *fileName, char *buffer, size_t bufferSize) {
+	FIL file;
+	UINT bytesRead;
+	FRESULT result;
 
+	result = f_open(&file, fileName, FA_READ);
+
+	// handle error opening file
+	if (result != FR_OK) {
+		return 0;
+	}
+
+	result = f_read(&file, buffer, bufferSize - 1, &bytesRead);
+	if (result != FR_OK) {
+		f_close(&file);
+		return 0;
+	}
+
+	buffer[bytesRead] = '\0';
+	f_close(&file);
+
+	for (int i = 0; i < bytesRead; i++) {
+		if (buffer[i] == '\r' || buffer[i] == '\n') {
+			buffer[i] = '\0';
+			break;
+		}
+	}
+
+	return 1;
+}
 
 /* ***NEED:  a function that gets the user input from the keyboard */
 
@@ -188,6 +217,8 @@ int main(void)
     }
     else if(Appli_state == APPLICATION_DISCONNECT){
     	HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12, GPIO_PIN_RESET);
+    	isSdCardMounted = 0;
+    	wavPlayer_stop();
     }
 
     // if USB flash drive is connected...
@@ -204,6 +235,11 @@ int main(void)
     	if(HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0)){
 			// Iterate through each wav file
 			for (int i = 0; i < NUM_FILES; i++) {
+				// Handle unplugging flash drive mid play
+				if (Appli_state != APPLICATION_READY) {
+					break;
+				}
+
 				HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13, GPIO_PIN_SET); // Turn on LED to indicate button pressed
 
 				// generate the file names
@@ -216,12 +252,35 @@ int main(void)
 				// wait until the current wav file is finished playing
 				while (!wavPlayer_isFinished()) {
 					wavPlayer_process();
+
+					// Handle unplugging flash drive mid play
+					if (Appli_state != APPLICATION_READY) {
+						break;
+					}
 				}
 
 				// turn off the LED when playback finishes
 				wavPlayer_stop();
 
 				HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13, GPIO_PIN_RESET); // Turn on LED to indicate playback ended
+
+				// TESTING FOR READING FROM TEXT FILE (WORKS!)
+
+//				if (readWordFromFile(txtFileName, expectedWord, sizeof(expectedWord))) {
+//					if (strcmp(expectedWord, "goodbye") == 0) {
+//						while (1) {
+//							HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13, GPIO_PIN_SET);
+//							HAL_Delay(200);
+//							HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13, GPIO_PIN_RESET);
+//							HAL_Delay(200);
+//						}
+//					}
+//				}
+
+				// Handle unplugging flash drive mid play
+				if (Appli_state != APPLICATION_READY) {
+					break;
+				}
 
 				// *** NEED: 1.) read from the text file using the function above
 				//           2.) get the user input using the function above
