@@ -37,6 +37,13 @@
 #include <string.h>
 #include "app.h"
 
+#include <stdio.h>
+#include <stdint.h>
+#include "screen.h"
+#include "keyboard.h"
+#include "ESLApplication.h"
+
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -62,6 +69,16 @@ extern ApplicationTypeDef Appli_state;
 #define NUM_FILES 10 // number of wav files
 #define MAX_WORD_LENGTH 32 // buffer size
 uint8_t fileIndices[NUM_FILES]; // use list of integers instead of strings
+
+uint8_t columnNumber = 0;
+uint8_t current_row = 0;
+int screenColumn = 0;
+int screenRow = 0;
+int keyDetected = 0;
+
+char current_word[32] = "";  // Global word buffer with space for 32 characters
+//PRESS ENTER WITH EXPECTED WORD AND IT DELETES
+char expected_word[32] = "HELLO";
 
 /* USER CODE END PV */
 
@@ -191,6 +208,32 @@ int main(void)
   audioI2S_setHandle(&hi2s3);
   bool isSdCardMounted=0;
 
+  // Turn on Power Switch
+  HAL_GPIO_WritePin(Power_Switch_GPIO_Port, Power_Switch_Pin, SET);
+
+  // Initialize LCD screen
+  Lcd_PortType ports[] = {
+	LCD_D4_GPIO_Port, LCD_D5_GPIO_Port, LCD_D6_GPIO_Port, LCD_D7_GPIO_Port
+	};
+
+  Lcd_PinType pins[] = {LCD_D4_Pin, LCD_D5_Pin, LCD_D6_Pin, LCD_D7_Pin};
+
+  // Create LCD handle
+  Lcd_HandleTypeDef lcd = Lcd_create(ports, pins, LCD_RS_GPIO_Port, LCD_RS_Pin, LCD_E_GPIO_Port, LCD_E_Pin, LCD_4_BIT_MODE);
+
+  // initialize LCD
+  Lcd_init(&lcd);
+  Lcd_cursor(&lcd, 0, 0);  // Set cursor to the first row, first column
+  Lcd_string(&lcd, "Presione 'Start'");  // Display "Press" on the first row
+  Lcd_cursor(&lcd, 1, 0);  // Set cursor to the second row, first column
+  Lcd_string(&lcd, "para comenzar");  // Display "Start" on the second row
+
+  // start timer
+  if (HAL_TIM_Base_Start_IT(&htim2) != HAL_OK)
+  {
+	  Error_Handler();
+  }
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -198,6 +241,8 @@ int main(void)
   while (1)
   {
 	appMainLoop();
+
+	scanKeyboard(&lcd, &screenRow, &screenColumn);
   }
     /* USER CODE END WHILE */
     MX_USB_HOST_Process();
@@ -252,6 +297,32 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) // 4 kHz clock
+{
+	if (htim -> Instance == TIM2 && keyDetected == 0)
+	{
+		// Reset all rows to high
+		HAL_GPIO_WritePin(Y0_GPIO_Port, Y0_Pin, SET);
+		HAL_GPIO_WritePin(Y1_GPIO_Port, Y1_Pin, SET);
+		HAL_GPIO_WritePin(Y2_GPIO_Port, Y2_Pin, SET);
+
+		// Drive the current row low
+		switch (current_row)
+		{
+		case 0:
+			HAL_GPIO_WritePin(Y0_GPIO_Port, Y0_Pin, RESET);
+			break;
+		case 1:
+			HAL_GPIO_WritePin(Y1_GPIO_Port, Y1_Pin, RESET);
+			break;
+		case 2:
+			HAL_GPIO_WritePin(Y2_GPIO_Port, Y2_Pin, RESET);
+			break;
+		}
+
+		current_row = (current_row + 1) % 3; // update current row
+	}
+}
 
 /* USER CODE END 4 */
 
