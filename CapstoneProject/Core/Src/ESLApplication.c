@@ -1,9 +1,3 @@
-/*
- * ESLApplication.c
- *
- *  Created on: Oct 23, 2024
- *      Author: Owner
- */
 #include "ESLApplication.h"
 
 extern int screenColumn;

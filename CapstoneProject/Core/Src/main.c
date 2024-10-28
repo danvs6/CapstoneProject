@@ -31,6 +31,8 @@
 
 
 
+
+
 #include <stdio.h>
 #include <stdint.h>
 #include "screen.h"
@@ -117,6 +119,12 @@ int main(void)
   MX_USB_OTG_FS_HCD_Init();
   MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
+
+
+
+
+
+
 
   // Turn on Power Switch
   HAL_GPIO_WritePin(Power_Switch_GPIO_Port, Power_Switch_Pin, SET);
