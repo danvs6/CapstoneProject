@@ -29,7 +29,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <string.h>
-
+#include "app.h"
 
 /* USER CODE END Includes */
 
@@ -60,11 +60,6 @@ RNG_HandleTypeDef hrng;
 /* USER CODE BEGIN PV */
 
 #define NUM_FILES 10 // number of wav files
-// char *wavFiles[NUM_FILES] = {"1.wav", "2.wav", "3.wav", "4.wav", "5.wav", "6.wav", "7.wav", "8.wav", "9.wav", "10.wav"};
-
-
-// more memory efficient method:
-// #define NUM_FILES 100
 #define MAX_WORD_LENGTH 32 // buffer size
 uint8_t fileIndices[NUM_FILES]; // use list of integers instead of strings
 
@@ -209,107 +204,12 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
-    MX_USB_HOST_Process();
-
     /* USER CODE BEGIN 3 */
-    if(Appli_state == APPLICATION_START){
-    	HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12, GPIO_PIN_SET); // Turn on LED when USB application starts
-    }
-    else if(Appli_state == APPLICATION_DISCONNECT){
-    	HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12, GPIO_PIN_RESET);
-    	isSdCardMounted = 0;
-    	wavPlayer_stop();
-    }
-
-    // if USB flash drive is connected...
-    if(Appli_state == APPLICATION_READY){
-    	if(!isSdCardMounted){
-    		f_mount(&USBHFatFS, (const TCHAR*)USBHPath, 0); // Mount the file system on the USB drive
-    		isSdCardMounted=1;
-
-    		// generate integers and shuffle before first one plays
-    		initializeIndices(fileIndices, NUM_FILES);
-    		fisherYatesShuffle(fileIndices, NUM_FILES);
-    	}
-
-    	if(HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0)){
-			// Iterate through each wav file
-			for (int i = 0; i < NUM_FILES; i++) {
-				// Handle unplugging flash drive mid play
-				if (Appli_state != APPLICATION_READY) {
-					break;
-				}
-
-				HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13, GPIO_PIN_SET); // Turn on LED to indicate button pressed
-
-				// generate the file names
-				snprintf(wavFileName, sizeof(wavFileName), "%d.wav", fileIndices[i]);
-				snprintf(txtFileName, sizeof(txtFileName), "%d.txt", fileIndices[i]);
-
-				wavPlayer_fileSelect(wavFileName);					 // Select wav file based on name above
-				wavPlayer_play();								     // Play selected wav file
-
-				// wait until the current wav file is finished playing
-				while (!wavPlayer_isFinished()) {
-					wavPlayer_process();
-
-					// Handle unplugging flash drive mid play
-					if (Appli_state != APPLICATION_READY) {
-						break;
-					}
-				}
-
-				// turn off the LED when playback finishes
-				wavPlayer_stop();
-
-				HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13, GPIO_PIN_RESET); // Turn on LED to indicate playback ended
-
-				// TESTING FOR READING FROM TEXT FILE (WORKS!)
-
-//				if (readWordFromFile(txtFileName, expectedWord, sizeof(expectedWord))) {
-//					if (strcmp(expectedWord, "goodbye") == 0) {
-//						while (1) {
-//							HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13, GPIO_PIN_SET);
-//							HAL_Delay(200);
-//							HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13, GPIO_PIN_RESET);
-//							HAL_Delay(200);
-//						}
-//					}
-//				}
-
-				// Handle unplugging flash drive mid play
-				if (Appli_state != APPLICATION_READY) {
-					break;
-				}
-
-				// *** NEED: 1.) read from the text file using the function above
-				//           2.) get the user input using the function above
-				//           3.) compare the user input and the word using the function above
-				//           4.) trigger a feedback mechanism (LED?)
-
-				// wait for the user to press the pushbutton to begin playing the next file:
-				// (this simulates waiting until the user types in the correct word to move on)
-
-				// **IMPLEMENTATION DESIGN for waiting till user gets proper word**
-
-
-				//
-
-				while (!HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0)) {
-					// wait until the button is pressed
-					HAL_Delay(100);  // debounce delay
-				}
-			}
-
-			// shuffle the audio files after each full playback sequence
-			fisherYatesShuffle(fileIndices, NUM_FILES);
-		}
-    }
+	appMainLoop();
   }
-}
 
   /* USER CODE END 3 */
-
+}
 /**
   * @brief System Clock Configuration
   * @retval None

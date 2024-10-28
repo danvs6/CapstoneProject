@@ -46,101 +46,6 @@ bool wavPlayer_fileSelect(const char* filePath)
 {
   WAV_HeaderTypeDef wavHeader;
   UINT readBytes = 0;
-  //Open WAV file
-
-  // TESTING ERROR
- // FRESULT res = f_open(&wavFile, filePath, FA_READ);
-
-  // Declare an integer for each FR_x result, initialized to 0
-//  int fr_ok = 0;
-//  int fr_disk_err = 0;
-//  int fr_int_err = 0;
-//  int fr_not_ready = 0;
-//  int fr_no_file = 0;
-//  int fr_no_path = 0;
-//  int fr_invalid_name = 0;
-//  int fr_denied = 0;
-//  int fr_exist = 0;
-//  int fr_invalid_object = 0;
-//  int fr_write_protected = 0;
-//  int fr_invalid_drive = 0;
-//  int fr_not_enabled = 0;
-//  int fr_no_filesystem = 0;
-//  int fr_mkfs_aborted = 0;
-//  int fr_timeout = 0;
-//  int fr_locked = 0;
-//  int fr_not_enough_core = 0;
-//  int fr_too_many_open_files = 0;
-//  int fr_invalid_parameter = 0;
-//
-//  switch(res) {
-//      case FR_OK:
-//          fr_ok = 1;
-//          break;
-//      case FR_DISK_ERR:
-//          fr_disk_err = 1;
-//          break;
-//      case FR_INT_ERR:
-//          fr_int_err = 1;
-//          break;
-//      case FR_NOT_READY:
-//          fr_not_ready = 1;
-//          break;
-//      case FR_NO_FILE:
-//          fr_no_file = 1;
-//          break;
-//      case FR_NO_PATH:
-//          fr_no_path = 1;
-//          break;
-//      case FR_INVALID_NAME:
-//          fr_invalid_name = 1;
-//          break;
-//      case FR_DENIED:
-//          fr_denied = 1;
-//          break;
-//      case FR_EXIST:
-//          fr_exist = 1;
-//          break;
-//      case FR_INVALID_OBJECT:
-//          fr_invalid_object = 1;
-//          break;
-//      case FR_WRITE_PROTECTED:
-//          fr_write_protected = 1;
-//          break;
-//      case FR_INVALID_DRIVE:
-//          fr_invalid_drive = 1;
-//          break;
-//      case FR_NOT_ENABLED:
-//          fr_not_enabled = 1;
-//          break;
-//      case FR_NO_FILESYSTEM:
-//          fr_no_filesystem = 1;
-//          break;
-//      case FR_MKFS_ABORTED:
-//          fr_mkfs_aborted = 1;
-//          break;
-//      case FR_TIMEOUT:
-//          fr_timeout = 1;
-//          break;
-//      case FR_LOCKED:
-//          fr_locked = 1;
-//          break;
-//      case FR_NOT_ENOUGH_CORE:
-//          fr_not_enough_core = 1;
-//          break;
-//      case FR_TOO_MANY_OPEN_FILES:
-//          fr_too_many_open_files = 1;
-//          break;
-//      case FR_INVALID_PARAMETER:
-//          fr_invalid_parameter = 1;
-//          break;
-//      default:
-//          // Handle unknown FRESULT codes if needed
-//          break;
-//  }
-
-
-  // END OF TESTING ERROR
 
   if(f_open(&wavFile, filePath, FA_READ) != FR_OK)
   {
@@ -161,7 +66,7 @@ bool wavPlayer_fileSelect(const char* filePath)
 void wavPlayer_play(void)
 {
   isFinished = false;
-  //Initialise I2S Audio Sampling settings
+  //Initialize I2S Audio Sampling settings
   audioI2S_init(samplingFreq);
   //Read Audio data from USB Disk
   f_lseek(&wavFile, 0);
