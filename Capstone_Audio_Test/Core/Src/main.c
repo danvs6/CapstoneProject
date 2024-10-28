@@ -188,13 +188,12 @@ int main(void)
   MX_USB_HOST_Init();
   MX_FATFS_Init();
   MX_RNG_Init();
+
   /* USER CODE BEGIN 2 */
   CS43_Init(hi2c1, MODE_I2S);
   CS43_SetVolume(255); // this goes from 0-255
   CS43_Enable_RightLeft(CS43_RIGHT_LEFT);
-
   audioI2S_setHandle(&hi2s3);
-
   bool isSdCardMounted=0;
 
   /* USER CODE END 2 */
@@ -203,11 +202,11 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-    /* USER CODE END WHILE */
-    /* USER CODE BEGIN 3 */
 	appMainLoop();
   }
+  /* USER CODE END WHILE */
 
+  /* USER CODE BEGIN 3 */
   /* USER CODE END 3 */
 }
 /**
