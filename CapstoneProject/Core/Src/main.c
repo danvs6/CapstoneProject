@@ -24,6 +24,13 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+
+
+
+
+
+
+
 #include <stdio.h>
 #include <stdint.h>
 #include "screen.h"
@@ -50,6 +57,12 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
+
+
+
+
+
+
 uint8_t columnNumber = 0;
 uint8_t current_row = 0;
 int screenColumn = 0;

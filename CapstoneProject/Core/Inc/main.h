@@ -65,8 +65,6 @@ void Error_Handler(void);
 #define PH0_OSC_IN_GPIO_Port GPIOH
 #define PH1_OSC_OUT_Pin GPIO_PIN_1
 #define PH1_OSC_OUT_GPIO_Port GPIOH
-#define OTG_FS_PowerSwitchOn_Pin GPIO_PIN_0
-#define OTG_FS_PowerSwitchOn_GPIO_Port GPIOC
 #define LCD_E_Pin GPIO_PIN_6
 #define LCD_E_GPIO_Port GPIOA
 #define LCD_RS_Pin GPIO_PIN_7
@@ -91,14 +89,6 @@ void Error_Handler(void);
 #define Y1_GPIO_Port GPIOD
 #define Y2_Pin GPIO_PIN_11
 #define Y2_GPIO_Port GPIOD
-#define LD4_Pin GPIO_PIN_12
-#define LD4_GPIO_Port GPIOD
-#define LD3_Pin GPIO_PIN_13
-#define LD3_GPIO_Port GPIOD
-#define LD5_Pin GPIO_PIN_14
-#define LD5_GPIO_Port GPIOD
-#define LD6_Pin GPIO_PIN_15
-#define LD6_GPIO_Port GPIOD
 #define S0_Pin GPIO_PIN_6
 #define S0_GPIO_Port GPIOC
 #define S1_Pin GPIO_PIN_7
