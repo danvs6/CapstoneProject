@@ -36,86 +36,86 @@ static char userInput[MAX_WORD_LENGTH];
 static void initializeIndices(uint8_t *array, int n);
 static void fisherYatesShuffle(uint8_t *array, int n);
 static int readWordFromFile(const char *fileName, char *buffer, size_t bufferSize);
+static void initializeDAC_USB(void);
+static void processAudioFiles(void);
 
 
 // main while-loop code
 void appMainLoop(void) {
-	static bool isSdCardMounted = 0;
-    MX_USB_HOST_Process();
-
-    if (Appli_state == APPLICATION_START) {
-        HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12, GPIO_PIN_SET); // USB application starts
-    }
-    else if (Appli_state == APPLICATION_DISCONNECT) {
-        HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12, GPIO_PIN_RESET);
-        isSdCardMounted = 0;
-        wavPlayer_stop();
-    }
+	initializeDAC_USB();
 
     if (Appli_state == APPLICATION_READY) {
-        if (!isSdCardMounted) {
-            f_mount(&USBHFatFS, (const TCHAR*)USBHPath, 0);
-            isSdCardMounted = 1;
-
-            initializeIndices(fileIndices, NUM_FILES);
-            fisherYatesShuffle(fileIndices, NUM_FILES);
-        }
-
         if (HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0)) {
-            // Iterate through each wav file
-            for (int i = 0; i < NUM_FILES; i++) {
-                HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13, GPIO_PIN_SET); // Indicate button pressed
-
-                // Generate the file names
-                snprintf(wavFileName, sizeof(wavFileName), "%d.wav", fileIndices[i]);
-                snprintf(txtFileName, sizeof(txtFileName), "%d.txt", fileIndices[i]);
-
-                //if (wavPlayer_fileSelect(wavFileName) != WAV_OK) {
-                if (!wavPlayer_fileSelect(wavFileName)) {
-                    HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13, GPIO_PIN_RESET);
-                    continue;
-                }
-
-                wavPlayer_play();
-
-                // Wait until the current wav file is finished playing
-                while (!wavPlayer_isFinished()) {
-                    wavPlayer_process();
-
-                    // Handle unplugging flash drive mid-play
-                    if (Appli_state != APPLICATION_READY) {
-                        wavPlayer_stop();
-                        break;
-                    }
-                }
-
-                wavPlayer_stop();
-
-                HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13, GPIO_PIN_RESET); // Indicate playback ended
-
-                // Handle unplugging flash drive mid-play
-                if (Appli_state != APPLICATION_READY) {
-                    break;
-                }
-
-                // TODO:
-                // 1. Read from the text file using readWordFromFile
-                // 2. Get the user input (needs implementation)
-                // 3. Compare the user input with the expected word (needs implementation)
-                // 4. Trigger a feedback mechanism (e.g., LED)
-
-                // Wait for the user to press the pushbutton to begin playing the next file
-                while (!HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0)) {
-                    HAL_Delay(100);  // Debounce delay
-                }
-            }
-
-            // Shuffle the audio files after each full playback sequence
-            fisherYatesShuffle(fileIndices, NUM_FILES);
+            processAudioFiles();
         }
     }
 }
 
+static void initializeDAC_USB(void) {
+	static bool isSdCardMounted = 0;
+	MX_USB_HOST_Process();
+
+	if (Appli_state == APPLICATION_START) {
+		HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12, GPIO_PIN_SET); // USB application starts
+	}
+	else if (Appli_state == APPLICATION_DISCONNECT) {
+		HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12, GPIO_PIN_RESET);
+		isSdCardMounted = 0;
+		wavPlayer_stop();
+	}
+
+	if (Appli_state == APPLICATION_READY) {
+		if (!isSdCardMounted) {
+			f_mount(&USBHFatFS, (const TCHAR*)USBHPath, 0);
+			isSdCardMounted = 1;
+
+			initializeIndices(fileIndices, NUM_FILES);
+			fisherYatesShuffle(fileIndices, NUM_FILES);
+		}
+	}
+}
+
+static void processAudioFiles(void) {
+	// Iterate through each wav file
+	for (int i = 0; i < NUM_FILES; i++) {
+		HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13, GPIO_PIN_SET); // Indicate button pressed
+
+		// Generate the file names
+		snprintf(wavFileName, sizeof(wavFileName), "%d.wav", fileIndices[i]);
+		snprintf(txtFileName, sizeof(txtFileName), "%d.txt", fileIndices[i]);
+
+		//if (wavPlayer_fileSelect(wavFileName) != WAV_OK) {
+		if (!wavPlayer_fileSelect(wavFileName)) {
+			HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13, GPIO_PIN_RESET);
+			continue;
+		}
+
+		wavPlayer_play();
+
+		// Wait until the current wav file is finished playing
+		while (!wavPlayer_isFinished()) {
+			wavPlayer_process();
+		}
+
+		wavPlayer_stop();
+
+		HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13, GPIO_PIN_RESET); // Indicate playback ended
+
+		// TODO:
+		// 1. Read from the text file using readWordFromFile
+		// 2. Get the user input (needs implementation)
+		// 3. Compare the user input with the expected word (needs implementation)
+		// 4. Trigger a feedback mechanism (e.g., LED)
+
+		// Wait for the user to press the pushbutton to begin playing the next file
+		while (!HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0)) {
+			HAL_Delay(100);  // Debounce delay
+		}
+	}
+
+	// Shuffle the audio files after each full playback sequence
+	fisherYatesShuffle(fileIndices, NUM_FILES);
+}
 
 static void initializeIndices(uint8_t *array, int n) {
     for (uint8_t i = 0; i < n; i++) {
