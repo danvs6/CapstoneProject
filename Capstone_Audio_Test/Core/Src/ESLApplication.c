@@ -112,6 +112,7 @@ void startApplication(){
 			handleIncorrectWord();
 		}
 
+		//
 //		 If correct,
 //			- play audio correct audio file
 //			- light the green LED
