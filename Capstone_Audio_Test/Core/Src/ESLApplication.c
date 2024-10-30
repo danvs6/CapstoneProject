@@ -9,6 +9,8 @@ extern char current_word[32] ;  // Global word buffer with space for 32 characte
 extern char expected_word[MAX_WORD_LENGTH];
 extern char userInput[MAX_WORD_LENGTH];
 extern uint8_t fileIndices[NUM_FILES];
+extern Lcd_HandleTypeDef lcd;
+extern int started;
 
 void processSpecialKey(char key, int correct){
 	switch (key){
@@ -50,13 +52,6 @@ void processSpecialKey(char key, int correct){
 void startApplication(){
 	// Initialize the DAC and USB
 	initializeDAC_USB();
-
-	// Set up the start screen
-	Lcd_clear(&lcd);
-	Lcd_cursor(&lcd, 0, 0);  // Set cursor to the first row, first column
-	Lcd_string(&lcd, "Presione 'Start'");  // Display "Press" on the first row
-	Lcd_cursor(&lcd, 1, 0);  // Set cursor to the second row, first column
-	Lcd_string(&lcd, "para comenzar");  // Display "Start" on the second row
 
 	// Wait for user to press start while scanning the keyboard
 	while (1) {

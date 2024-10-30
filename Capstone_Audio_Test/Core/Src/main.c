@@ -50,6 +50,7 @@
 /* USER CODE BEGIN PTD */
 extern ApplicationTypeDef Appli_state;
 
+Lcd_HandleTypeDef lcd;
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -143,7 +144,7 @@ int main(void)
   Lcd_PinType pins[] = {LCD_D4_Pin, LCD_D5_Pin, LCD_D6_Pin, LCD_D7_Pin};
 
   // Create LCD handle
-  Lcd_HandleTypeDef lcd = Lcd_create(ports, pins, LCD_RS_GPIO_Port, LCD_RS_Pin, LCD_E_GPIO_Port, LCD_E_Pin, LCD_4_BIT_MODE);
+  lcd = Lcd_create(ports, pins, LCD_RS_GPIO_Port, LCD_RS_Pin, LCD_E_GPIO_Port, LCD_E_Pin, LCD_4_BIT_MODE);
 
   // initialize LCD
   Lcd_init(&lcd);
