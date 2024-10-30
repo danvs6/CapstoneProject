@@ -148,10 +148,8 @@ int main(void)
 
   // initialize LCD
   Lcd_init(&lcd);
-  Lcd_cursor(&lcd, 0, 0);  // Set cursor to the first row, first column
-  Lcd_string(&lcd, "Presione 'Start'");  // Display "Press" on the first row
-  Lcd_cursor(&lcd, 1, 0);  // Set cursor to the second row, first column
-  Lcd_string(&lcd, "para comenzar");  // Display "Start" on the second row
+
+  startUpScreen();
 
   // start timer
   if (HAL_TIM_Base_Start_IT(&htim2) != HAL_OK)
@@ -165,7 +163,7 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	appMainLoop();
+	//appMainLoop();
 
 	scanKeyboard(&lcd, &screenRow, &screenColumn);
   }

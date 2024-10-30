@@ -12,6 +12,14 @@ extern uint8_t fileIndices[NUM_FILES];
 extern Lcd_HandleTypeDef lcd;
 extern int started;
 
+void startUpScreen()
+{
+	  Lcd_cursor(&lcd, 0, 0);  // Set cursor to the first row, first column
+	  Lcd_string(&lcd, "Presione 'Start'");  // Display "Press" on the first row
+	  Lcd_cursor(&lcd, 1, 0);  // Set cursor to the second row, first column
+	  Lcd_string(&lcd, "para comenzar");  // Display "Start" on the second row
+}
+
 void processSpecialKey(char key, int correct){
 	switch (key){
 		case KEY_START:
@@ -53,14 +61,6 @@ void startApplication(){
 	// Initialize the DAC and USB
 	initializeDAC_USB();
 
-	// Wait for user to press start while scanning the keyboard
-	while (1) {
-		scanKeyboard(&lcd, &screenRow, &screenColumn);
-		if (started) {
-			break;
-		}
-	}
-
 	// Create a list of numbers, Shuffles, start for loop, generate .wav and .txt files, play audio
 	initializeIndices(fileIndices, NUM_FILES);
 	fisherYatesShuffle(fileIndices, NUM_FILES);
@@ -99,15 +99,6 @@ void startApplication(){
 			scanKeyboard(&lcd, &screenRow, &screenColumn);
 		}
 
-		// Compare the user input with expected_word
-		if (strcmp(current_word, expected_word) == 0) {
-			handleCorrectWord();
-		}
-		else {
-			handleIncorrectWord();
-		}
-
-		//
 //		 If correct,
 //			- play audio correct audio file
 //			- light the green LED
@@ -124,21 +115,29 @@ void startApplication(){
 }
 
 //end
-void endApplication(){
-
+void endApplication()
+{
+	startUpScreen();
 }
 
-void handleHelpFunction(){
-
+void handleHelpFunction()
+{
+	// audio here
 }
 
 //handling for correct word entered
-void handleCorrectWord(){
-
+void handleCorrectWord()
+{
+	Lcd_clear(&lcd);  // Clear the display
+	screenRow = 0;
+	screenColumn = 0;
+	moveCursor(&lcd, 0,0); //move cursor to first position
+	memset(current_word, 0, sizeof(current_word));  // Reset current_word to empty
 }
 
 //handling for incorrect word entered
-void handleIncorrectWord(){
-
+void handleIncorrectWord()
+{
+	// audio here
 }
 

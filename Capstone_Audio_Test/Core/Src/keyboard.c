@@ -83,12 +83,7 @@ void processKeyPress(char key, Lcd_HandleTypeDef *lcd, int *screenRow, int *scre
 				// Check if the typed word matches the expected word
 				if (strcmp(current_word, expected_word) == 0)
 				{
-					Lcd_clear(lcd);  // Clear the display
-					processSpecialKey(key, 1);  // Handle successful ENTER key press
-					(*screenRow) = 0;
-					(*screenColumn) = 0;
-					moveCursor(lcd, 0,0); //move cursor to first position
-					memset(current_word, 0, sizeof(current_word));  // Reset current_word to empty
+					processSpecialKey(key, 1);
 				}
 				else
 				{
@@ -101,17 +96,8 @@ void processKeyPress(char key, Lcd_HandleTypeDef *lcd, int *screenRow, int *scre
 			case KEY_END:
 			{
 				started = 0;
-				Lcd_clear(lcd);  // Clear the display
-				(*screenRow) = 0;
-				(*screenColumn) = 0;
-				moveCursor(lcd, 0,0); //move cursor to first position
-				memset(current_word, 0, sizeof(current_word));  // Reset current_word to empty
 				processSpecialKey(key, 1);
-				Lcd_init(lcd);
-				Lcd_cursor(lcd, 0, 0);  // Set cursor to the first row, first column
-				Lcd_string(lcd, "Presione 'Start'");  // Display "Press" on the first row
-				Lcd_cursor(lcd, 1, 0);  // Set cursor to the second row, first column
-				Lcd_string(lcd, "para comenzar");  // Display "Start" on the second row
+				memset(current_word, 0, sizeof(current_word));  // Reset current_word to empty
 				break;
 			}
 
@@ -140,7 +126,7 @@ void processKeyPress(char key, Lcd_HandleTypeDef *lcd, int *screenRow, int *scre
 		}
 	}
 
-	else
+	else // application not started
 	{
 		if(key == KEY_START)
 		{
