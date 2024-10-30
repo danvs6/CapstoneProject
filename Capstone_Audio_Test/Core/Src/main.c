@@ -65,11 +65,6 @@ extern ApplicationTypeDef Appli_state;
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-
-#define NUM_FILES 10 // number of wav files
-#define MAX_WORD_LENGTH 32 // buffer size
-uint8_t fileIndices[NUM_FILES]; // use list of integers instead of strings
-
 uint8_t columnNumber = 0;
 uint8_t current_row = 0;
 int screenColumn = 0;
@@ -92,76 +87,6 @@ void MX_USB_HOST_Process(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
-// space for .wav and .txt
-char wavFileName[16];
-char txtFileName[16];
-
-char expectedWord[MAX_WORD_LENGTH];
-char userInput[MAX_WORD_LENGTH];
-
-// Generate 100 integers
-void initializeIndices(uint8_t *array, int n) {
-	for (uint8_t i = 0; i < n; i++) {
-		array[i] = i+1;
-	}
-}
-
-// Fisher-Yates shuffle for randomizing array of wav files
-void fisherYatesShuffle(uint8_t *array, int n) {
-	for (int i = n-1; i > 0; i--) {
-		uint32_t randomNumber;
-
-		if (HAL_RNG_GenerateRandomNumber(&hrng, &randomNumber) != HAL_OK) {
-			randomNumber = 0;
-		}
-
-		int j = randomNumber % (i+1); // generate a random index between 0 and i
-
-		// swap array[j] with array[i]
-		uint8_t temp = array[i];
-		array[i] = array[j];
-		array[j] = temp;
-	}
-}
-
-/* ***NEED:  a function that reads from the .txt file */
-int readWordFromFile(const char *fileName, char *buffer, size_t bufferSize) {
-	FIL file;
-	UINT bytesRead;
-	FRESULT result;
-
-	result = f_open(&file, fileName, FA_READ);
-
-	// handle error opening file
-	if (result != FR_OK) {
-		return 0;
-	}
-
-	result = f_read(&file, buffer, bufferSize - 1, &bytesRead);
-	if (result != FR_OK) {
-		f_close(&file);
-		return 0;
-	}
-
-	buffer[bytesRead] = '\0';
-	f_close(&file);
-
-	for (int i = 0; i < bytesRead; i++) {
-		if (buffer[i] == '\r' || buffer[i] == '\n') {
-			buffer[i] = '\0';
-			break;
-		}
-	}
-
-	return 1;
-}
-
-/* ***NEED:  a function that gets the user input from the keyboard */
-
-
-/* ***NEED:  a function that compares the word read from the .txt file and the user input */
-
 
 /* USER CODE END 0 */
 
@@ -206,7 +131,6 @@ int main(void)
   CS43_SetVolume(255); // this goes from 0-255
   CS43_Enable_RightLeft(CS43_RIGHT_LEFT);
   audioI2S_setHandle(&hi2s3);
-  bool isSdCardMounted=0;
 
   // Turn on Power Switch
   HAL_GPIO_WritePin(Power_Switch_GPIO_Port, Power_Switch_Pin, SET);

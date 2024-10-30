@@ -25,19 +25,19 @@ extern RNG_HandleTypeDef hrng;
 #define NUM_FILES 10
 #define MAX_WORD_LENGTH 32
 
-static uint8_t fileIndices[NUM_FILES];
+uint8_t fileIndices[NUM_FILES];
 
-static char wavFileName[16];
-static char txtFileName[16];
+char wavFileName[16];
+char txtFileName[16];
 
-static char expectedWord[MAX_WORD_LENGTH];
-static char userInput[MAX_WORD_LENGTH];
+char expectedWord[MAX_WORD_LENGTH];
+char userInput[MAX_WORD_LENGTH];
 
-static void initializeIndices(uint8_t *array, int n);
-static void fisherYatesShuffle(uint8_t *array, int n);
-static int readWordFromFile(const char *fileName, char *buffer, size_t bufferSize);
-static void initializeDAC_USB(void);
-static void processAudioFiles(void);
+void initializeIndices(uint8_t *array, int n);
+void fisherYatesShuffle(uint8_t *array, int n);
+int readWordFromFile(const char *fileName, char *buffer, size_t bufferSize);
+void initializeDAC_USB(void);
+void processAudioFiles(void);
 
 
 // main while-loop code
@@ -51,7 +51,7 @@ void appMainLoop(void) {
     }
 }
 
-static void initializeDAC_USB(void) {
+void initializeDAC_USB(void) {
 	static bool isSdCardMounted = 0;
 	MX_USB_HOST_Process();
 
@@ -75,7 +75,7 @@ static void initializeDAC_USB(void) {
 	}
 }
 
-static void processAudioFiles(void) {
+void processAudioFiles(void) {
 	// Iterate through each wav file
 	for (int i = 0; i < NUM_FILES; i++) {
 		HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13, GPIO_PIN_SET); // Indicate button pressed
@@ -117,13 +117,13 @@ static void processAudioFiles(void) {
 	fisherYatesShuffle(fileIndices, NUM_FILES);
 }
 
-static void initializeIndices(uint8_t *array, int n) {
+void initializeIndices(uint8_t *array, int n) {
     for (uint8_t i = 0; i < n; i++) {
         array[i] = i + 1;
     }
 }
 
-static void fisherYatesShuffle(uint8_t *array, int n) {
+void fisherYatesShuffle(uint8_t *array, int n) {
     for (int i = n - 1; i > 0; i--) {
         uint32_t randomNumber;
 
@@ -140,7 +140,7 @@ static void fisherYatesShuffle(uint8_t *array, int n) {
     }
 }
 
-static int readWordFromFile(const char *fileName, char *buffer, size_t bufferSize) {
+int readWordFromFile(const char *fileName, char *buffer, size_t bufferSize) {
     FIL file;
     UINT bytesRead;
     FRESULT result;
