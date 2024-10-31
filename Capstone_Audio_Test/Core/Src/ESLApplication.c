@@ -58,13 +58,13 @@ void processSpecialKey(char key, int correct){
 
 //initializations
 void startApplication(){
-	// Initialize the DAC and USB
+//	// Initialize the DAC and USB
 	initializeDAC_USB();
-
-	// Create a list of numbers, Shuffles, start for loop, generate .wav and .txt files, play audio
+//
+//	// Create a list of numbers, Shuffles, start for loop, generate .wav and .txt files, play audio
 	initializeIndices(fileIndices, NUM_FILES);
 	fisherYatesShuffle(fileIndices, NUM_FILES);
-
+//
 	for (int i = 0; i < NUM_FILES; i++) {
 		HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13, GPIO_PIN_SET); // Indicate button pressed
 
@@ -94,24 +94,25 @@ void startApplication(){
 		}
 
 		memset(current_word, 0, sizeof(current_word)); // clear userInput buffer
-		started = 1;
-		while (started) {
+
+		while (started)
+		{
 			scanKeyboard(&lcd, &screenRow, &screenColumn);
 		}
-
-//		 If correct,
-//			- play audio correct audio file
-//			- light the green LED
-//			- clear the screen
-//			- go to the next word
-//		 If incorrect,
-//			- play audio wrong! file
-//			- light the yellow LED
-//			- handle user deleting words
+//
+////		 If correct,
+////			- play audio correct audio file
+////			- light the green LED
+////			- clear the screen
+////			- go to the next word
+////		 If incorrect,
+////			- play audio wrong! file
+////			- light the yellow LED
+////			- handle user deleting words
 	}
-
-	// Shuffle the audio files after each full playback sequence
-	fisherYatesShuffle(fileIndices, NUM_FILES);
+//
+//	// Shuffle the audio files after each full playback sequence
+//	fisherYatesShuffle(fileIndices, NUM_FILES);
 }
 
 //end
