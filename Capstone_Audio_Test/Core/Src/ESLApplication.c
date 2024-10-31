@@ -102,11 +102,12 @@ void handleCorrectWord() {
 	// To turn off the Yellow LED
 	HAL_GPIO_WritePin(YellowLED_GPIO_Port, YellowLED_Pin, GPIO_PIN_RESET);
 
-
-	HAL_Delay(2999);
-
     // To turn on the Green LED
     HAL_GPIO_WritePin(GreenLED_GPIO_Port, GreenLED_Pin, GPIO_PIN_SET);
+
+    HAL_Delay(999);
+    HAL_GPIO_WritePin(GreenLED_GPIO_Port, GreenLED_Pin, GPIO_PIN_RESET);
+
 
     playNextFile();
 }
@@ -177,9 +178,9 @@ void handleIncorrectWord()
 	// To turn on the Yellow LED
 	HAL_GPIO_WritePin(YellowLED_GPIO_Port, YellowLED_Pin, GPIO_PIN_SET);
 
-	HAL_Delay(2999);
+	HAL_Delay(999);
 
-	// To turn off the Green LED
+	// To turn off the Yellow LED
 	HAL_GPIO_WritePin(GPIOE, YellowLED_Pin, GPIO_PIN_RESET);
 
 }
