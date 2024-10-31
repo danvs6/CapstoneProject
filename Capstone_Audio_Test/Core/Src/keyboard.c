@@ -12,6 +12,7 @@ extern uint8_t current_row;
 extern int keyDetected;
 extern char current_word[32];
 extern char expected_word[32];
+
 int started = 0;
 
 // keyboard mapping
@@ -106,6 +107,9 @@ void processKeyPress(char key, Lcd_HandleTypeDef *lcd, int *screenRow, int *scre
 				processSpecialKey(key, 1);
 				break;
 			}
+
+			case KEY_START:
+				break; // do nothing
 
 			default:
 			{
