@@ -2,6 +2,7 @@
 #include "app.h"
 #include "keyboard.h"
 #include "screen.h"
+#include "wav_player.h"
 #include <ctype.h>
 
 extern int screenColumn;
@@ -65,13 +66,61 @@ void processSpecialKey(char key, int correct){
 
 }
 
-void startApplication() {
-    // Wait for DAC to initialize
-    while (!initializeDAC_USB());
+// Helper function to handle repeating the word
+void repeatAudio() {
+	snprintf(wavFileName, sizeof(wavFileName), "%d.wav", fileIndices[current_index]);
+	if (!wavPlayer_fileSelect(wavFileName));
 
-    // Initialize and shuffle file indices
-    initializeIndices(fileIndices, NUM_FILES);
-    fisherYatesShuffle(fileIndices, NUM_FILES);
+	wavPlayer_play();
+
+	while (!wavPlayer_isFinished())
+	{
+		wavPlayer_process();
+	}
+
+	wavPlayer_stop();
+}
+
+// Helper function to play the next file and handle index reset
+void playNextFile() {
+    // Check if current_index exceeds NUM_FILES
+    if (current_index > NUM_FILES) {
+        // Shuffle the files again and reset the index
+        fisherYatesShuffle(fileIndices, NUM_FILES);
+        current_index = 1;
+    }
+
+//    HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13, GPIO_PIN_SET); // Indicate button pressed
+
+    snprintf(wavFileName, sizeof(wavFileName), "%d.wav", fileIndices[current_index]);
+    snprintf(txtFileName, sizeof(txtFileName), "%d.txt", fileIndices[current_index]);
+
+    // Attempt to select and play the audio file
+    if (!wavPlayer_fileSelect(wavFileName));
+
+    wavPlayer_play();
+
+    while (!wavPlayer_isFinished())
+    {
+        wavPlayer_process();
+    }
+
+    wavPlayer_stop();
+
+    // Attempt to read and capitalize the word from the text file
+    if (readWordFromFile(txtFileName, expected_word, sizeof(expected_word)))
+    {
+        capitalizeWord(expected_word);
+    }
+}
+
+void startApplication() {
+
+	while (!(initializeDAC_USB()));
+
+//    // Initialize and shuffle file indices
+//    initializeIndices(fileIndices, NUM_FILES);
+//    fisherYatesShuffle(fileIndices, NUM_FILES);
 
 	if (!wavPlayer_fileSelect("11.wav"));
 
@@ -108,43 +157,8 @@ void handleCorrectWord() {
 
     HAL_GPIO_WritePin(GreenLED_GPIO_Port, GreenLED_Pin, GPIO_PIN_RESET);
 
-    playNextFile();
-}
-
-// Helper function to play the next file and handle index reset
-void playNextFile() {
-    // Check if current_index exceeds NUM_FILES
-    if (current_index > NUM_FILES) {
-        // Shuffle the files again and reset the index
-        fisherYatesShuffle(fileIndices, NUM_FILES);
-        current_index = 1;
-    }
-
-    HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13, GPIO_PIN_SET); // Indicate button pressed
-
-    snprintf(wavFileName, sizeof(wavFileName), "%d.wav", fileIndices[current_index]);
-    snprintf(txtFileName, sizeof(txtFileName), "%d.txt", fileIndices[current_index]);
-
-    // Attempt to select and play the audio file
-    if (!wavPlayer_fileSelect(wavFileName));
-
-    wavPlayer_play();
-
-    while (!wavPlayer_isFinished())
-    {
-        wavPlayer_process();
-    }
-
-    wavPlayer_stop();
-
-    // Attempt to read and capitalize the word from the text file
-    if (readWordFromFile(txtFileName, expected_word, sizeof(expected_word)))
-    {
-        capitalizeWord(expected_word);
-    }
-
-    // Increment the index for the next file
     current_index++;
+    playNextFile();
 }
 
 
@@ -157,8 +171,9 @@ void endApplication()
 void handleHelpFunction()
 {
 	// audio here
-	current_index--;
-	playNextFile();
+//	current_index--;
+//	playNextFile();
+	repeatAudio();
 }
 
 //handling for incorrect word entered

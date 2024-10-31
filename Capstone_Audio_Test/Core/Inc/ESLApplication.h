@@ -29,4 +29,6 @@ void handleCorrectWord();
 //handling for incorrect word entered
 void handleIncorrectWord();
 
+void repeatAudio();
+
 #endif /* INC_ESLAPPLICATION_H_ */
