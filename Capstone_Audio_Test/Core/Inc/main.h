@@ -71,6 +71,10 @@ void Error_Handler(void);
 #define LCD_D7_GPIO_Port GPIOB
 #define BOOT1_Pin GPIO_PIN_2
 #define BOOT1_GPIO_Port GPIOB
+#define GreenLED_Pin GPIO_PIN_8
+#define GreenLED_GPIO_Port GPIOE
+#define YellowLED_Pin GPIO_PIN_9
+#define YellowLED_GPIO_Port GPIOE
 #define S1_Pin GPIO_PIN_15
 #define S1_GPIO_Port GPIOB
 #define Power_Switch_Pin GPIO_PIN_8
