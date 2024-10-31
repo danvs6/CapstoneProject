@@ -36,7 +36,6 @@ char userInput[MAX_WORD_LENGTH];
 void initializeIndices(uint8_t *array, int n);
 void fisherYatesShuffle(uint8_t *array, int n);
 int readWordFromFile(const char *fileName, char *buffer, size_t bufferSize);
-void initializeDAC_USB(void);
 void processAudioFiles(void);
 
 
@@ -51,7 +50,7 @@ void appMainLoop(void) {
     }
 }
 
-void initializeDAC_USB(void) {
+int initializeDAC_USB() {
 	static bool isSdCardMounted = 0;
 	MX_USB_HOST_Process();
 
@@ -73,6 +72,7 @@ void initializeDAC_USB(void) {
 			fisherYatesShuffle(fileIndices, NUM_FILES);
 		}
 	}
+	return isSdCardMounted;
 }
 
 void processAudioFiles(void) {

@@ -21,7 +21,7 @@ extern char expectedWord[MAX_WORD_LENGTH];
 extern char userInput[MAX_WORD_LENGTH];
 
 void appMainLoop(void);
-void initializeDAC_USB(void);
+int initializeDAC_USB();
 void processAudioFiles(void);
 
 void initializeIndices(uint8_t *array, int n);

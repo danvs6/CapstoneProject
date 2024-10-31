@@ -8,6 +8,8 @@
 #define KEY_DELETE 0xF4
 #define KEY_SPACEBAR 0xF5
 
+void capitalizeWord(char *word);
+
 void startUpScreen();
 
 void processSpecialKey(char key, int correct);
