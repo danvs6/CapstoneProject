@@ -59,57 +59,57 @@ void processSpecialKey(char key, int correct){
 //initializations
 void startApplication(){
 //	// Initialize the DAC and USB
-	initializeDAC_USB();
+//	initializeDAC_USB();
 //
 //	// Create a list of numbers, Shuffles, start for loop, generate .wav and .txt files, play audio
-	initializeIndices(fileIndices, NUM_FILES);
-	fisherYatesShuffle(fileIndices, NUM_FILES);
+//	initializeIndices(fileIndices, NUM_FILES);
+//	fisherYatesShuffle(fileIndices, NUM_FILES);
 //
-	for (int i = 0; i < NUM_FILES; i++) {
-		HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13, GPIO_PIN_SET); // Indicate button pressed
-
-		// Generate the file names
-		snprintf(wavFileName, sizeof(wavFileName), "%d.wav", fileIndices[i]);
-		snprintf(txtFileName, sizeof(txtFileName), "%d.txt", fileIndices[i]);
-
-		if (!wavPlayer_fileSelect(wavFileName)) {
-			HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13, GPIO_PIN_RESET);
-			continue;
-		}
-
-		wavPlayer_play();
-
-		// Wait until the current .wav file is finished playing
-		while (!wavPlayer_isFinished()) {
-			wavPlayer_process();
-		}
-
-		wavPlayer_stop();
-
-		HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13, GPIO_PIN_RESET); // Indicate playback ended
-
-		// Read the expected word from the .txt file
-		if (!readWordFromFile(txtFileName, expected_word, sizeof(expected_word))) {
-			continue;
-		}
-
-		memset(current_word, 0, sizeof(current_word)); // clear userInput buffer
-
-		while (started)
-		{
-			scanKeyboard(&lcd, &screenRow, &screenColumn);
-		}
+//	for (int i = 0; i < NUM_FILES; i++) {
+//		HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13, GPIO_PIN_SET); // Indicate button pressed
 //
-////		 If correct,
-////			- play audio correct audio file
-////			- light the green LED
-////			- clear the screen
-////			- go to the next word
-////		 If incorrect,
-////			- play audio wrong! file
-////			- light the yellow LED
-////			- handle user deleting words
-	}
+//		// Generate the file names
+//		snprintf(wavFileName, sizeof(wavFileName), "%d.wav", fileIndices[i]);
+//		snprintf(txtFileName, sizeof(txtFileName), "%d.txt", fileIndices[i]);
+//
+//		if (!wavPlayer_fileSelect(wavFileName)) {
+//			HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13, GPIO_PIN_RESET);
+//			continue;
+//		}
+//
+//		wavPlayer_play();
+//
+//		// Wait until the current .wav file is finished playing
+//		while (!wavPlayer_isFinished()) {
+//			wavPlayer_process();
+//		}
+//
+//		wavPlayer_stop();
+//
+//		HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13, GPIO_PIN_RESET); // Indicate playback ended
+//
+//		// Read the expected word from the .txt file
+//		if (!readWordFromFile(txtFileName, expected_word, sizeof(expected_word))) {
+//			continue;
+//		}
+//
+//		memset(current_word, 0, sizeof(current_word)); // clear userInput buffer
+//
+////		while (started)
+////		{
+////			scanKeyboard(&lcd, &screenRow, &screenColumn);
+////		}
+////
+//////		 If correct,
+//////			- play audio correct audio file
+//////			- light the green LED
+//////			- clear the screen
+//////			- go to the next word
+//////		 If incorrect,
+//////			- play audio wrong! file
+//////			- light the yellow LED
+//////			- handle user deleting words
+//	}
 //
 //	// Shuffle the audio files after each full playback sequence
 //	fisherYatesShuffle(fileIndices, NUM_FILES);

@@ -97,7 +97,7 @@ void processKeyPress(char key, Lcd_HandleTypeDef *lcd, int *screenRow, int *scre
 			{
 				started = 0;
 				processSpecialKey(key, 1);
-				memset(current_word, 0, sizeof(current_word));  // Reset current_word to empty
+				//memset(current_word, 0, sizeof(current_word));  // Reset current_word to empty
 				break;
 			}
 
