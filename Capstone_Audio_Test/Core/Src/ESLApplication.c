@@ -88,10 +88,10 @@ void handleCorrectWord() {
     memset(current_word, 0, sizeof(current_word));  // Reset current_word to empty
 
 	// To turn off the Yellow LED
-	HAL_GPIO_WritePin(GPIOE, YellowLED_Pin, GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(YellowLED_GPIO_Port, YellowLED_Pin, GPIO_PIN_RESET);
 
     // To turn on the Green LED
-    HAL_GPIO_WritePin(GPIOE, GreenLED_Pin, GPIO_PIN_SET);
+    HAL_GPIO_WritePin(GreenLED_GPIO_Port, GreenLED_Pin, GPIO_PIN_SET);
 
 
     playNextFile();
@@ -157,10 +157,10 @@ void handleIncorrectWord()
 	// audio here
 
 	// To turn off the Green LED
-	HAL_GPIO_WritePin(GPIOE, GreenLED_Pin, GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(GreenLED_GPIO_Port, GreenLED_Pin, GPIO_PIN_RESET);
 
 	// To turn on the Yellow LED
-	HAL_GPIO_WritePin(GPIOE, YellowLED_Pin, GPIO_PIN_SET);
+	HAL_GPIO_WritePin(YellowLED_GPIO_Port, YellowLED_Pin, GPIO_PIN_SET);
 
 }
 
