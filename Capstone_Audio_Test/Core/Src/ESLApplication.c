@@ -73,16 +73,15 @@ void startApplication() {
     initializeIndices(fileIndices, NUM_FILES);
     fisherYatesShuffle(fileIndices, NUM_FILES);
 
-	if (!wavPlayer_fileSelect("11.wav")) {
-		printf("File %s not found or could not be selected.\n", wavFileName);
-		HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13, GPIO_PIN_RESET);
-		return;  // Exit if file is not found
-	}
+	if (!wavPlayer_fileSelect("11.wav"));
 
 	wavPlayer_play();
-	while (!wavPlayer_isFinished()) {
+
+	while (!wavPlayer_isFinished())
+	{
 		wavPlayer_process();
 	}
+
 	wavPlayer_stop();
 
     // Reset current index to 1
@@ -106,8 +105,8 @@ void handleCorrectWord() {
     HAL_GPIO_WritePin(GreenLED_GPIO_Port, GreenLED_Pin, GPIO_PIN_SET);
 
     HAL_Delay(999);
-    HAL_GPIO_WritePin(GreenLED_GPIO_Port, GreenLED_Pin, GPIO_PIN_RESET);
 
+    HAL_GPIO_WritePin(GreenLED_GPIO_Port, GreenLED_Pin, GPIO_PIN_RESET);
 
     playNextFile();
 }
@@ -127,29 +126,25 @@ void playNextFile() {
     snprintf(txtFileName, sizeof(txtFileName), "%d.txt", fileIndices[current_index]);
 
     // Attempt to select and play the audio file
-    if (!wavPlayer_fileSelect(wavFileName)) {
-        printf("File %s not found or could not be selected.\n", wavFileName);
-        HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13, GPIO_PIN_RESET);
-        return;  // Exit if file is not found
-    }
+    if (!wavPlayer_fileSelect(wavFileName));
 
     wavPlayer_play();
-    while (!wavPlayer_isFinished()) {
+
+    while (!wavPlayer_isFinished())
+    {
         wavPlayer_process();
     }
+
     wavPlayer_stop();
 
     // Attempt to read and capitalize the word from the text file
-    if (readWordFromFile(txtFileName, expected_word, sizeof(expected_word))) {
+    if (readWordFromFile(txtFileName, expected_word, sizeof(expected_word)))
+    {
         capitalizeWord(expected_word);
-        printf("Expected word set to: %s\n", expected_word);
-    } else {
-        printf("Failed to read expected word from %s.\n", txtFileName);
     }
 
     // Increment the index for the next file
     current_index++;
-    HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13, GPIO_PIN_RESET); // Indicate end of playback
 }
 
 
@@ -169,9 +164,6 @@ void handleHelpFunction()
 //handling for incorrect word entered
 void handleIncorrectWord()
 {
-	// audio here
-
-
 	// To turn off the Green LED
 	HAL_GPIO_WritePin(GreenLED_GPIO_Port, GreenLED_Pin, GPIO_PIN_RESET);
 
