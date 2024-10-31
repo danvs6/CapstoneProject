@@ -119,8 +119,8 @@ void startApplication() {
 	while (!(initializeDAC_USB()));
 
 //    // Initialize and shuffle file indices
-//    initializeIndices(fileIndices, NUM_FILES);
-//    fisherYatesShuffle(fileIndices, NUM_FILES);
+    initializeIndices(fileIndices, NUM_FILES);
+    fisherYatesShuffle(fileIndices, NUM_FILES);
 
 	if (!wavPlayer_fileSelect("11.wav"));
 

@@ -67,9 +67,6 @@ int initializeDAC_USB() {
 		if (!isSdCardMounted) {
 			f_mount(&USBHFatFS, (const TCHAR*)USBHPath, 0);
 			isSdCardMounted = 1;
-
-			initializeIndices(fileIndices, NUM_FILES);
-			fisherYatesShuffle(fileIndices, NUM_FILES);
 		}
 	}
 	return isSdCardMounted;
