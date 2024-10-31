@@ -71,6 +71,8 @@ void Error_Handler(void);
 #define LCD_D7_GPIO_Port GPIOB
 #define BOOT1_Pin GPIO_PIN_2
 #define BOOT1_GPIO_Port GPIOB
+#define S1_Pin GPIO_PIN_15
+#define S1_GPIO_Port GPIOB
 #define Power_Switch_Pin GPIO_PIN_8
 #define Power_Switch_GPIO_Port GPIOD
 #define Y0_Pin GPIO_PIN_9
@@ -87,8 +89,6 @@ void Error_Handler(void);
 #define S3_GPIO_Port GPIOC
 #define COM_Pin GPIO_PIN_8
 #define COM_GPIO_Port GPIOA
-#define S1_Pin GPIO_PIN_10
-#define S1_GPIO_Port GPIOA
 
 /* USER CODE BEGIN Private defines */
 
