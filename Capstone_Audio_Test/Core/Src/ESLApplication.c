@@ -73,6 +73,18 @@ void startApplication() {
     initializeIndices(fileIndices, NUM_FILES);
     fisherYatesShuffle(fileIndices, NUM_FILES);
 
+	if (!wavPlayer_fileSelect("11.wav")) {
+		printf("File %s not found or could not be selected.\n", wavFileName);
+		HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13, GPIO_PIN_RESET);
+		return;  // Exit if file is not found
+	}
+
+	wavPlayer_play();
+	while (!wavPlayer_isFinished()) {
+		wavPlayer_process();
+	}
+	wavPlayer_stop();
+
     // Reset current index to 1
     current_index = 1;
 
@@ -88,10 +100,12 @@ void handleCorrectWord() {
     memset(current_word, 0, sizeof(current_word));  // Reset current_word to empty
 
 	// To turn off the Yellow LED
-	HAL_GPIO_WritePin(GPIOE, YellowLED_Pin, GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(GPIOE, GreenLED_Pin, GPIO_PIN_SET);
+
+	HAL_Delay(2999);
 
     // To turn on the Green LED
-    HAL_GPIO_WritePin(GPIOE, GreenLED_Pin, GPIO_PIN_SET);
+    HAL_GPIO_WritePin(GPIOE, GreenLED_Pin, GPIO_PIN_RESET);
 
 
     playNextFile();
@@ -156,11 +170,13 @@ void handleIncorrectWord()
 {
 	// audio here
 
-	// To turn off the Green LED
-	HAL_GPIO_WritePin(GPIOE, GreenLED_Pin, GPIO_PIN_RESET);
-
 	// To turn on the Yellow LED
 	HAL_GPIO_WritePin(GPIOE, YellowLED_Pin, GPIO_PIN_SET);
+
+	HAL_Delay(2999);
+
+	// To turn off the Green LED
+	HAL_GPIO_WritePin(GPIOE, YellowLED_Pin, GPIO_PIN_RESET);
 
 }
 
