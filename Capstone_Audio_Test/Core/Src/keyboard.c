@@ -84,12 +84,16 @@ void processKeyPress(char key, Lcd_HandleTypeDef *lcd, int *screenRow, int *scre
 				// Check if the typed word matches the expected word
 				if (strcmp(current_word, expected_word) == 0)
 				{
+					HAL_Delay(20);
 					processSpecialKey(key, 1);
+					HAL_Delay(20);
 				}
 				else
 				{
 					// Handle incorrect entry
+					HAL_Delay(20);
 					processSpecialKey(key, 0);
+					HAL_Delay(20);
 				}
 				break;
 			}
@@ -97,18 +101,23 @@ void processKeyPress(char key, Lcd_HandleTypeDef *lcd, int *screenRow, int *scre
 			case KEY_END:
 			{
 				started = 0;
+				HAL_Delay(20);
 				processSpecialKey(key, 1);
+				HAL_Delay(20);
 				//memset(current_word, 0, sizeof(current_word));  // Reset current_word to empty
 				break;
 			}
 
 			case KEY_HELP:
 			{
+				HAL_Delay(20);
 				processSpecialKey(key, 1);
+				HAL_Delay(20);
 				break;
 			}
 
 			case KEY_START:
+				HAL_Delay(20);
 				break; // do nothing
 
 			default:
@@ -140,7 +149,9 @@ void processKeyPress(char key, Lcd_HandleTypeDef *lcd, int *screenRow, int *scre
 			(*screenColumn) = 0;
 			moveCursor(lcd, 0,0); //move cursor to first position
 			memset(current_word, 0, sizeof(current_word));  // Reset current_word to empty
+			HAL_Delay(20);
 			processSpecialKey(key, 1);
+			HAL_Delay(20);
 		}
 	}
 }

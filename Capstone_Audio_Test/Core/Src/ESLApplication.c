@@ -122,16 +122,16 @@ void startApplication() {
     initializeIndices(fileIndices, NUM_FILES);
     fisherYatesShuffle(fileIndices, NUM_FILES);
 
-	if (!wavPlayer_fileSelect("11.wav"));
-
-	wavPlayer_play();
-
-	while (!wavPlayer_isFinished())
-	{
-		wavPlayer_process();
-	}
-
-	wavPlayer_stop();
+//	if (!wavPlayer_fileSelect("11.wav"));
+//
+//	wavPlayer_play();
+//
+//	while (!wavPlayer_isFinished())
+//	{
+//		wavPlayer_process();
+//	}
+//
+//	wavPlayer_stop();
 
     // Reset current index to 1
     current_index = 1;
