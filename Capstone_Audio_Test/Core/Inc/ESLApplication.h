@@ -35,4 +35,6 @@ void repeatAudio();
 
 void showCorrection();
 
+void showEncouragement();
+
 #endif /* INC_ESLAPPLICATION_H_ */

@@ -4,6 +4,15 @@
 #include "screen.h"
 #include "wav_player.h"
 #include <ctype.h>
+#include <stdlib.h>
+
+#include <stdatomic.h>
+
+// Define atomic counters
+atomic_int helpCounter = 0;
+atomic_int enterCounter = 0;
+atomic_int current_index = 1;
+
 
 extern int screenColumn;
 extern int screenRow;
@@ -13,8 +22,12 @@ extern char userInput[MAX_WORD_LENGTH];
 extern uint8_t fileIndices[NUM_FILES];
 extern Lcd_HandleTypeDef lcd;
 extern int started;
-int current_index = 1;
-int helpCounter = 0;
+
+
+const char *encouragementMessages[] = {
+    "Sigue asi", "Bien hecho", "Excelente",
+	"Fantastico", "Muy bien", "Impresionante"
+};
 
 
 void capitalizeWord(char *word) {
@@ -83,10 +96,10 @@ void repeatAudio() {
 // Helper function to play the next file and handle index reset
 void playNextFile() {
     // Check if current_index exceeds NUM_FILES
-    if (current_index >= NUM_FILES) {
+    if (atomic_load(&current_index) >= NUM_FILES) {
         // Shuffle the files again and reset the index
         fisherYatesShuffle(fileIndices, NUM_FILES);
-        current_index = 1;
+        atomic_store(&current_index, 1);
     }
 
 //    HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13, GPIO_PIN_SET); // Indicate button pressed
@@ -134,7 +147,7 @@ void startApplication() {
 //	wavPlayer_stop();
 
     // Reset current index to 1
-    current_index = 1;
+    atomic_store(&current_index, 1);
 
     playNextFile();
 }
@@ -147,17 +160,22 @@ void handleCorrectWord() {
     moveCursor(&lcd, 0, 0);
     memset(current_word, 0, sizeof(current_word));  // Reset current_word to empty
 
+    showEncouragement();
 	// To turn off the Yellow LED
 	HAL_GPIO_WritePin(YellowLED_GPIO_Port, YellowLED_Pin, GPIO_PIN_RESET);
 
     // To turn on the Green LED
     HAL_GPIO_WritePin(GreenLED_GPIO_Port, GreenLED_Pin, GPIO_PIN_SET);
 
-    HAL_Delay(999);
+    HAL_Delay(2999);
 
     HAL_GPIO_WritePin(GreenLED_GPIO_Port, GreenLED_Pin, GPIO_PIN_RESET);
 
-    current_index++;
+    Lcd_clear(&lcd);
+
+    HAL_Delay(10);
+
+  //  atomic_fetch_add(&current_index, 1);
     playNextFile();
 }
 
@@ -169,22 +187,44 @@ void endApplication()
 }
 
 void handleHelpFunction() {
-    // Increment the help counter
-    helpCounter++;
-
-    // Check if help has been requested three times for the current word
-    if (helpCounter >= 3) {
-        // Display the correct word on the screen
-        showCorrection();
-        HAL_Delay(5000);
-        handleNewPlayAfterRevealingWord();
-        helpCounter = 0;
-    } else {
-        // Replay the audio if help has been requested fewer than three times
+    // Increment the help counter atomically
+//    atomic_fetch_add(&helpCounter, 1);
+//
+//    // Calculate the current length of current_word
+//    size_t currentLength = strlen(current_word);
+//
+//    // Check if current_word is not already fully revealed
+//    if(atomic_load(&helpCounter) >= 3){
+//		if (currentLength < strlen(expected_word)) {
+//			// Clear the LCD and reset the displayed content
+//			Lcd_clear(&lcd);
+//
+//			// Reveal the next letter from expected_word and add it to current_word
+//			current_word[currentLength] = expected_word[currentLength];
+//			current_word[currentLength + 1] = '\0';  // Null-terminate current_word
+//
+//			// Display the updated current_word on the LCD
+//			Lcd_string(&lcd, current_word);
+//
+//			// Move the cursor to the next position
+//			screenRow = 0;
+//			screenColumn = currentLength;
+//			moveCursor(&lcd, &screenRow, &screenColumn);
+//			HAL_Delay(999);
+//
+//			// Reset the help counter if the word is fully revealed
+//			if (strlen(current_word) == strlen(expected_word)) {
+//				atomic_store(&helpCounter, 0);
+//				showCorrection();
+//				HAL_Delay(2999);
+//				handleNewPlayAfterRevealingWord();
+//			}
+//		}
+//    } else {
+        // If the word is already completed, reset the help counter
         repeatAudio();
-    }
+//    }
 }
-
 
 void handleNewPlayAfterRevealingWord(){
 	// Clear screen and reset variables
@@ -200,12 +240,12 @@ void handleNewPlayAfterRevealingWord(){
 	// To turn on the Yellow LED
 	HAL_GPIO_WritePin(YellowLED_GPIO_Port, YellowLED_Pin, GPIO_PIN_SET);
 
-	HAL_Delay(999);
+	HAL_Delay(2999);
 
 	// To turn off the Yellow LED
 	HAL_GPIO_WritePin(GPIOE, YellowLED_Pin, GPIO_PIN_RESET);
 
-	current_index++;
+	atomic_fetch_add(&current_index, 1);
 	playNextFile();
 }
 
@@ -218,11 +258,10 @@ void handleIncorrectWord()
 	// To turn on the Yellow LED
 	HAL_GPIO_WritePin(YellowLED_GPIO_Port, YellowLED_Pin, GPIO_PIN_SET);
 
-	HAL_Delay(999);
+	HAL_Delay(2999);
 
 	// To turn off the Yellow LED
 	HAL_GPIO_WritePin(GPIOE, YellowLED_Pin, GPIO_PIN_RESET);
-
 }
 
 void showCorrection() {
@@ -232,5 +271,16 @@ void showCorrection() {
     Lcd_cursor(&lcd, 1, 0);
     Lcd_string(&lcd, expected_word);
 }
+
+void showEncouragement() {
+    int randomIndex = rand() % 6;  // Get a random message
+    Lcd_clear(&lcd);
+    Lcd_cursor(&lcd, 0, 0);
+    Lcd_string(&lcd, (char *)encouragementMessages[randomIndex]);
+}
+
+//counters can cause locking, try to find better way
+
+
 
 
