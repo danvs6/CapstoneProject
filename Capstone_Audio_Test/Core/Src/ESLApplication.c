@@ -17,8 +17,10 @@ int current_index = 1;
 int helpCounter = 0;
 
 
-void capitalizeWord(char *word) {
-    for (int i = 0; word[i] != '\0'; i++) {
+void capitalizeWord(char *word)
+{
+    for (int i = 0; word[i] != '\0'; i++)
+    {
         word[i] = toupper((unsigned char)word[i]);
     }
 }
@@ -31,8 +33,10 @@ void startUpScreen()
 	  Lcd_string(&lcd, "para comenzar");  // Display "Start" on the second row
 }
 
-void processSpecialKey(char key, int correct){
-	switch (key){
+void processSpecialKey(char key, int correct)
+{
+	switch (key)
+	{
 		case KEY_START:
 			// Handle KEY_START
 			startApplication();
@@ -50,10 +54,13 @@ void processSpecialKey(char key, int correct){
 
 		case KEY_ENTER:
 			// Handle KEY_ENTER
-			if(correct){
+			if(correct)
+			{
 				handleCorrectWord();
 			}
-			else{
+
+			else
+			{
 				handleIncorrectWord();
 			}
 
@@ -66,7 +73,8 @@ void processSpecialKey(char key, int correct){
 }
 
 // Helper function to handle repeating the word
-void repeatAudio() {
+void repeatAudio()
+{
 	snprintf(wavFileName, sizeof(wavFileName), "%d.wav", fileIndices[current_index]);
 	if (!wavPlayer_fileSelect(wavFileName));
 
@@ -81,15 +89,16 @@ void repeatAudio() {
 }
 
 // Helper function to play the next file and handle index reset
-void playNextFile() {
-    // Check if current_index exceeds NUM_FILES
-    if (current_index >= NUM_FILES) {
+void playNextFile()
+{
+
+	// Check if current_index exceeds NUM_FILES
+    if (current_index >= NUM_FILES)
+    {
         // Shuffle the files again and reset the index
         fisherYatesShuffle(fileIndices, NUM_FILES);
         current_index = 1;
     }
-
-//    HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13, GPIO_PIN_SET); // Indicate button pressed
 
     snprintf(wavFileName, sizeof(wavFileName), "%d.wav", fileIndices[current_index]);
     snprintf(txtFileName, sizeof(txtFileName), "%d.txt", fileIndices[current_index]);
@@ -113,7 +122,8 @@ void playNextFile() {
     }
 }
 
-void startApplication() {
+void startApplication()
+{
 
 	//THIS LINE CAUSES THE TIMING ISSUES WITH KEYS
 	while (!(initializeDAC_USB()));
@@ -139,7 +149,8 @@ void startApplication() {
     playNextFile();
 }
 
-void handleCorrectWord() {
+void handleCorrectWord()
+{
     // Clear screen and reset variables
     Lcd_clear(&lcd);
     screenRow = 0;
@@ -147,14 +158,12 @@ void handleCorrectWord() {
     moveCursor(&lcd, 0, 0);
     memset(current_word, 0, sizeof(current_word));  // Reset current_word to empty
 
-	// To turn off the Yellow LED
-	HAL_GPIO_WritePin(YellowLED_GPIO_Port, YellowLED_Pin, GPIO_PIN_RESET);
-
     // To turn on the Green LED
     HAL_GPIO_WritePin(GreenLED_GPIO_Port, GreenLED_Pin, GPIO_PIN_SET);
 
     HAL_Delay(999);
 
+    // turn off green LED
     HAL_GPIO_WritePin(GreenLED_GPIO_Port, GreenLED_Pin, GPIO_PIN_RESET);
 
     current_index++;
@@ -168,25 +177,31 @@ void endApplication()
 	startUpScreen();
 }
 
-void handleHelpFunction() {
+void handleHelpFunction()
+{
     // Increment the help counter
     helpCounter++;
 
     // Check if help has been requested three times for the current word
-    if (helpCounter >= 3) {
+    if (helpCounter >= 3)
+    {
         // Display the correct word on the screen
         showCorrection();
-        HAL_Delay(5000);
+
         handleNewPlayAfterRevealingWord();
         helpCounter = 0;
-    } else {
+    }
+
+    else
+    {
         // Replay the audio if help has been requested fewer than three times
         repeatAudio();
     }
 }
 
 
-void handleNewPlayAfterRevealingWord(){
+void handleNewPlayAfterRevealingWord()
+{
 	// Clear screen and reset variables
 	Lcd_clear(&lcd);
 	screenRow = 0;
@@ -194,16 +209,13 @@ void handleNewPlayAfterRevealingWord(){
 	moveCursor(&lcd, 0, 0);
 	memset(current_word, 0, sizeof(current_word));  // Reset current_word to empty
 
-	/// To turn off the Green LED
-	HAL_GPIO_WritePin(GreenLED_GPIO_Port, GreenLED_Pin, GPIO_PIN_RESET);
-
 	// To turn on the Yellow LED
 	HAL_GPIO_WritePin(YellowLED_GPIO_Port, YellowLED_Pin, GPIO_PIN_SET);
 
 	HAL_Delay(999);
 
 	// To turn off the Yellow LED
-	HAL_GPIO_WritePin(GPIOE, YellowLED_Pin, GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(YellowLED_GPIO_Port, YellowLED_Pin, GPIO_PIN_RESET);
 
 	current_index++;
 	playNextFile();
@@ -212,25 +224,24 @@ void handleNewPlayAfterRevealingWord(){
 //handling for incorrect word entered
 void handleIncorrectWord()
 {
-	// To turn off the Green LED
-	HAL_GPIO_WritePin(GreenLED_GPIO_Port, GreenLED_Pin, GPIO_PIN_RESET);
-
 	// To turn on the Yellow LED
 	HAL_GPIO_WritePin(YellowLED_GPIO_Port, YellowLED_Pin, GPIO_PIN_SET);
 
 	HAL_Delay(999);
 
 	// To turn off the Yellow LED
-	HAL_GPIO_WritePin(GPIOE, YellowLED_Pin, GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(YellowLED_GPIO_Port, YellowLED_Pin, GPIO_PIN_RESET);
 
 }
 
-void showCorrection() {
+void showCorrection()
+{
     Lcd_clear(&lcd);
     Lcd_cursor(&lcd, 0, 0);
     Lcd_string(&lcd, "Correcto: ");
     Lcd_cursor(&lcd, 1, 0);
     Lcd_string(&lcd, expected_word);
+    HAL_Delay(5000);
 }
 
 
