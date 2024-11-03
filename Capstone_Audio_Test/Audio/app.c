@@ -22,9 +22,6 @@ extern I2C_HandleTypeDef hi2c1;
 extern I2S_HandleTypeDef hi2s3;
 extern RNG_HandleTypeDef hrng;
 
-#define NUM_FILES 10
-#define MAX_WORD_LENGTH 32
-
 uint8_t fileIndices[NUM_FILES];
 
 char wavFileName[16];

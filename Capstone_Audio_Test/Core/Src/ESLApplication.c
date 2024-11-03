@@ -84,7 +84,7 @@ void repeatAudio() {
 // Helper function to play the next file and handle index reset
 void playNextFile() {
     // Check if current_index exceeds NUM_FILES
-    if (current_index > NUM_FILES) {
+    if (current_index >= NUM_FILES) {
         // Shuffle the files again and reset the index
         fisherYatesShuffle(fileIndices, NUM_FILES);
         current_index = 1;
