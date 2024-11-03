@@ -9,9 +9,9 @@
 #include <stdatomic.h>
 
 // Define atomic counters
-atomic_int helpCounter = 0;
-atomic_int enterCounter = 0;
-atomic_int current_index = 1;
+volatile atomic_int helpCounter = 0;
+volatile atomic_int enterCounter = 0;
+volatile atomic_int current_index = 1;
 
 
 extern int screenColumn;
@@ -175,7 +175,7 @@ void handleCorrectWord() {
 
     HAL_Delay(10);
 
-  //  atomic_fetch_add(&current_index, 1);
+    atomic_fetch_add(&current_index, 1);
     playNextFile();
 }
 
@@ -186,6 +186,7 @@ void endApplication()
 	startUpScreen();
 }
 
+//locking issues with counters
 void handleHelpFunction() {
     // Increment the help counter atomically
 //    atomic_fetch_add(&helpCounter, 1);
