@@ -166,10 +166,10 @@ int main(void)
 	//appMainLoop();
 
 	  scanKeyboard(&lcd, &screenRow, &screenColumn);
+	  MX_USB_HOST_Process();
 
   }
     /* USER CODE END WHILE */
-    MX_USB_HOST_Process();
 
     /* USER CODE BEGIN 3 */
   /* USER CODE END 3 */

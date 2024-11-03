@@ -116,6 +116,7 @@ void playNextFile() {
 
 void startApplication() {
 
+	//THIS LINE CAUSES THE TIMING ISSUES WITH KEYS
 	while (!(initializeDAC_USB()));
 
 //    // Initialize and shuffle file indices
