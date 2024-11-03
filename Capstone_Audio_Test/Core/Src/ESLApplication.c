@@ -14,6 +14,7 @@ extern uint8_t fileIndices[NUM_FILES];
 extern Lcd_HandleTypeDef lcd;
 extern int started;
 int current_index = 1;
+int helpCounter = 0;
 
 
 void capitalizeWord(char *word) {
@@ -50,11 +51,9 @@ void processSpecialKey(char key, int correct){
 		case KEY_ENTER:
 			// Handle KEY_ENTER
 			if(correct){
-				//handle correct entry
 				handleCorrectWord();
 			}
 			else{
-				//handle incorrect entry
 				handleIncorrectWord();
 			}
 
@@ -169,12 +168,45 @@ void endApplication()
 	startUpScreen();
 }
 
-void handleHelpFunction()
-{
-	// audio here
-//	current_index--;
-//	playNextFile();
-	repeatAudio();
+void handleHelpFunction() {
+    // Increment the help counter
+    helpCounter++;
+
+    // Check if help has been requested three times for the current word
+    if (helpCounter >= 3) {
+        // Display the correct word on the screen
+        showCorrection();
+        HAL_Delay(5000);
+        handleNewPlayAfterRevealingWord();
+        helpCounter = 0;
+    } else {
+        // Replay the audio if help has been requested fewer than three times
+        repeatAudio();
+    }
+}
+
+
+void handleNewPlayAfterRevealingWord(){
+	// Clear screen and reset variables
+	Lcd_clear(&lcd);
+	screenRow = 0;
+	screenColumn = 0;
+	moveCursor(&lcd, 0, 0);
+	memset(current_word, 0, sizeof(current_word));  // Reset current_word to empty
+
+	/// To turn off the Green LED
+	HAL_GPIO_WritePin(GreenLED_GPIO_Port, GreenLED_Pin, GPIO_PIN_RESET);
+
+	// To turn on the Yellow LED
+	HAL_GPIO_WritePin(YellowLED_GPIO_Port, YellowLED_Pin, GPIO_PIN_SET);
+
+	HAL_Delay(999);
+
+	// To turn off the Yellow LED
+	HAL_GPIO_WritePin(GPIOE, YellowLED_Pin, GPIO_PIN_RESET);
+
+	current_index++;
+	playNextFile();
 }
 
 //handling for incorrect word entered
@@ -192,4 +224,13 @@ void handleIncorrectWord()
 	HAL_GPIO_WritePin(GPIOE, YellowLED_Pin, GPIO_PIN_RESET);
 
 }
+
+void showCorrection() {
+    Lcd_clear(&lcd);
+    Lcd_cursor(&lcd, 0, 0);
+    Lcd_string(&lcd, "Correcto: ");
+    Lcd_cursor(&lcd, 1, 0);
+    Lcd_string(&lcd, expected_word);
+}
+
 

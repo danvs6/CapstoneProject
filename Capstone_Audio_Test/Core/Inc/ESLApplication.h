@@ -29,6 +29,10 @@ void handleCorrectWord();
 //handling for incorrect word entered
 void handleIncorrectWord();
 
+void handleNewPlayAfterRevealingWord();
+
 void repeatAudio();
+
+void showCorrection();
 
 #endif /* INC_ESLAPPLICATION_H_ */
