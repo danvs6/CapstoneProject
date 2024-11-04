@@ -22,6 +22,7 @@ extern char userInput[MAX_WORD_LENGTH];
 extern uint8_t fileIndices[NUM_FILES];
 extern Lcd_HandleTypeDef lcd;
 extern int started;
+extern int keyDetected;
 
 
 const char *encouragementMessages[] = {
@@ -80,6 +81,8 @@ void processSpecialKey(char key, int correct){
 
 // Helper function to handle repeating the word
 void repeatAudio() {
+	//GPIO Logic helps handle concurrency problems
+	HAL_GPIO_WritePin(YellowLED_GPIO_Port, YellowLED_Pin, GPIO_PIN_RESET);
 	snprintf(wavFileName, sizeof(wavFileName), "%d.wav", fileIndices[current_index]);
 	if (!wavPlayer_fileSelect(wavFileName));
 
@@ -91,10 +94,14 @@ void repeatAudio() {
 	}
 
 	wavPlayer_stop();
+	//GPIO Logic helps handle concurrency problems
+	HAL_GPIO_WritePin(YellowLED_GPIO_Port, YellowLED_Pin, GPIO_PIN_RESET);
 }
 
 // Helper function to play the next file and handle index reset
 void playNextFile() {
+	//GPIO Logic helps handle concurrency problems
+	HAL_GPIO_WritePin(YellowLED_GPIO_Port, YellowLED_Pin, GPIO_PIN_RESET);
     // Check if current_index exceeds NUM_FILES
     if (atomic_load(&current_index) >= NUM_FILES) {
         // Shuffle the files again and reset the index
@@ -124,6 +131,8 @@ void playNextFile() {
     {
         capitalizeWord(expected_word);
     }
+    //GPIO Logic helps handle concurrency problems
+    HAL_GPIO_WritePin(YellowLED_GPIO_Port, YellowLED_Pin, GPIO_PIN_RESET);
 }
 
 void startApplication() {
@@ -135,6 +144,8 @@ void startApplication() {
     initializeIndices(fileIndices, NUM_FILES);
     fisherYatesShuffle(fileIndices, NUM_FILES);
 
+//    //GPIO Logic helps handle concurrency problems
+//    HAL_GPIO_WritePin(YellowLED_GPIO_Port, YellowLED_Pin, GPIO_PIN_RESET);
 //	if (!wavPlayer_fileSelect("11.wav"));
 //
 //	wavPlayer_play();
@@ -145,9 +156,13 @@ void startApplication() {
 //	}
 //
 //	wavPlayer_stop();
+//    //GPIO Logic helps handle concurrency problems
+//    HAL_GPIO_WritePin(YellowLED_GPIO_Port, YellowLED_Pin, GPIO_PIN_RESET);
 
     // Reset current index to 1
     atomic_store(&current_index, 1);
+    atomic_store(&helpCounter, 0);
+    atomic_store(&enterCounter, 0);
 
     playNextFile();
 }
@@ -175,6 +190,8 @@ void handleCorrectWord() {
 
     HAL_Delay(10);
 
+    atomic_store(&helpCounter, 0);
+    atomic_store(&enterCounter, 0);
     atomic_fetch_add(&current_index, 1);
     playNextFile();
 }
@@ -189,43 +206,57 @@ void endApplication()
 //locking issues with counters
 void handleHelpFunction() {
     // Increment the help counter atomically
-//    atomic_fetch_add(&helpCounter, 1);
-//
-//    // Calculate the current length of current_word
-//    size_t currentLength = strlen(current_word);
-//
-//    // Check if current_word is not already fully revealed
-//    if(atomic_load(&helpCounter) >= 3){
-//		if (currentLength < strlen(expected_word)) {
-//			// Clear the LCD and reset the displayed content
-//			Lcd_clear(&lcd);
-//
-//			// Reveal the next letter from expected_word and add it to current_word
-//			current_word[currentLength] = expected_word[currentLength];
-//			current_word[currentLength + 1] = '\0';  // Null-terminate current_word
-//
-//			// Display the updated current_word on the LCD
-//			Lcd_string(&lcd, current_word);
-//
-//			// Move the cursor to the next position
-//			screenRow = 0;
-//			screenColumn = currentLength;
-//			moveCursor(&lcd, &screenRow, &screenColumn);
-//			HAL_Delay(999);
-//
-//			// Reset the help counter if the word is fully revealed
-//			if (strlen(current_word) == strlen(expected_word)) {
-//				atomic_store(&helpCounter, 0);
-//				showCorrection();
-//				HAL_Delay(2999);
-//				handleNewPlayAfterRevealingWord();
-//			}
-//		}
-//    } else {
-        // If the word is already completed, reset the help counter
+    int currentHelpCount = atomic_fetch_add(&helpCounter, 1) + 1;
+
+    // Check if helpCounter has reached the limit (e.g., 3)
+    if (currentHelpCount >= 3) {
+        // Calculate the current length of current_word
+        size_t currentLength = strlen(current_word);
+
+        // Check if current_word matches the beginning of expected_word
+		if (strncmp(current_word, expected_word, currentLength) != 0) {
+			// If it doesn't match, reset current_word
+			memset(current_word, 0, sizeof(current_word));
+			currentLength = 0;
+			Lcd_clear(&lcd);
+		}
+
+        // Check if current_word is not already fully revealed
+        if (currentLength < strlen(expected_word)) {
+            // Clear the LCD and reset the displayed content
+            Lcd_clear(&lcd);
+
+            // Reveal the next letter from expected_word and add it to current_word
+            current_word[currentLength] = expected_word[currentLength];
+            current_word[currentLength + 1] = '\0';  // Null-terminate current_word
+
+            // Display the updated current_word on the LCD
+            Lcd_string(&lcd, current_word);
+
+            // Move the cursor to the next position
+            screenRow = 0;
+            screenColumn = currentLength;
+            moveCursor(&lcd, &screenRow, &screenColumn);
+
+            HAL_Delay(10);
+            repeatAudio();
+
+            // If the word is fully revealed, show correction and reset
+            if (strlen(current_word) == strlen(expected_word)) {
+                showCorrection();
+                HAL_Delay(2999);
+                handleNewPlayAfterRevealingWord();
+            }
+        } else {
+            // If the word is already completed, repeat the audio instead
+            repeatAudio();
+        }
+    } else {
+        // If the helpCounter has not reached the limit, repeat the audio
         repeatAudio();
-//    }
+    }
 }
+
 
 void handleNewPlayAfterRevealingWord(){
 	// Clear screen and reset variables
@@ -246,6 +277,8 @@ void handleNewPlayAfterRevealingWord(){
 	// To turn off the Yellow LED
 	HAL_GPIO_WritePin(GPIOE, YellowLED_Pin, GPIO_PIN_RESET);
 
+	atomic_store(&helpCounter, 0);
+	atomic_store(&enterCounter, 0);
 	atomic_fetch_add(&current_index, 1);
 	playNextFile();
 }
@@ -253,6 +286,14 @@ void handleNewPlayAfterRevealingWord(){
 //handling for incorrect word entered
 void handleIncorrectWord()
 {
+	int currentEnterCount = atomic_fetch_add(&enterCounter, 1) + 1;
+
+	if(currentEnterCount >= 5){
+		showCorrection();
+		HAL_Delay(2999);
+		handleNewPlayAfterRevealingWord();
+		return;
+	}
 	// To turn off the Green LED
 	HAL_GPIO_WritePin(GreenLED_GPIO_Port, GreenLED_Pin, GPIO_PIN_RESET);
 

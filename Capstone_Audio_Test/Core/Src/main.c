@@ -66,11 +66,11 @@ Lcd_HandleTypeDef lcd;
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-uint8_t columnNumber = 0;
-uint8_t current_row = 0;
-int screenColumn = 0;
-int screenRow = 0;
-int keyDetected = 0;
+volatile uint8_t columnNumber = 0;
+volatile uint8_t current_row = 0;
+volatile int screenColumn = 0;
+volatile int screenRow = 0;
+volatile int keyDetected = 0;
 
 
 char current_word[32] = "";  // Global word buffer with space for 32 characters
