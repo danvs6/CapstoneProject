@@ -189,23 +189,29 @@ void scanKeyboard(Lcd_HandleTypeDef *lcd, int *screenRow, int *screenColumn)
 		// Check if a key is pressed in the current column
 		if (readMuxInput() == 0)  // 0 indicates a key press in the current column
 		{
-			keyDetected = 1;  // Stop the timer from iterating through rows
+			HAL_Delay(5);  // Short delay for debouncing
 
-			// Adjust the row due to the clock
-			current_row = rowReadjustment(current_row);
+			// Check if key press is still detected after debounce
+			if (readMuxInput() == 0)
+			{
+				keyDetected = 1;  // Stop the timer from iterating through rows
 
-			// Register the key press
-			char key = getKeyPressed(current_row, columnNumber);  // Get key from row/column
+				// Adjust the row due to the clock
+				current_row = rowReadjustment(current_row);
 
-			// Process the key press
-			processKeyPress(key, lcd, screenRow, screenColumn);
+				// Register the key press
+				char key = getKeyPressed(current_row, columnNumber);  // Get key from row/column
 
-			// Wait until the key is released to avoid key repetition
-			while (readMuxInput() == 0);
+				// Process the key press
+				processKeyPress(key, lcd, screenRow, screenColumn);
 
-			// Reset keyDetected after the key is released
-			keyDetected = 0;
-			return;
+				// Wait until the key is released to avoid key repetition
+				while (readMuxInput() == 0);
+
+				// Reset keyDetected after the key is released
+				keyDetected = 0;
+				return;
+			}
 		}
 	}
 }
