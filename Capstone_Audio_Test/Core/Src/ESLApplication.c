@@ -146,6 +146,9 @@ void playNextFile()
 
 void playTheGame()
 {
+   //GPIO Logic helps handle concurrency problems
+	HAL_GPIO_WritePin(YellowLED_GPIO_Port, YellowLED_Pin, GPIO_PIN_RESET);
+
 	if (!wavPlayer_fileSelect("11.wav"));
 
 	wavPlayer_play();
@@ -156,6 +159,9 @@ void playTheGame()
 	}
 
 	wavPlayer_stop();
+
+    //GPIO Logic helps handle concurrency problems
+    HAL_GPIO_WritePin(YellowLED_GPIO_Port, YellowLED_Pin, GPIO_PIN_RESET);
 }
 
 void startApplication()
@@ -167,14 +173,8 @@ void startApplication()
     initializeIndices(fileIndices, NUM_FILES);
     fisherYatesShuffle(fileIndices, NUM_FILES);
 
-    //GPIO Logic helps handle concurrency problems
-    HAL_GPIO_WritePin(YellowLED_GPIO_Port, YellowLED_Pin, GPIO_PIN_RESET);
-
     // silly intro
 	playTheGame();
-
-    //GPIO Logic helps handle concurrency problems
-    HAL_GPIO_WritePin(YellowLED_GPIO_Port, YellowLED_Pin, GPIO_PIN_RESET);
 
     // Reset current index to 1
     atomic_store(&current_index, 1);
