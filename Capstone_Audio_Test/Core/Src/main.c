@@ -26,6 +26,8 @@
 #include "tim.h"
 #include "usb_host.h"
 #include "gpio.h"
+#include "cmsis_os.h"
+
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -164,7 +166,6 @@ int main(void)
   {
 	  scanKeyboard(&lcd, &screenRow, &screenColumn);
 	  MX_USB_HOST_Process();
-
   }
     /* USER CODE END WHILE */
 
