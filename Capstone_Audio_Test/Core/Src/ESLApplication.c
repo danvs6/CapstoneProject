@@ -26,8 +26,8 @@ extern int keyDetected;
 
 
 const char *encouragementMessages[] = {
-    "Sigue asi", "Bien hecho", "Excelente",
-	"Fantastico", "Muy bien", "Impresionante"
+    "Sigue asi!", "Bien hecho!", "Excelente!",
+	"Fantastico!", "Muy bien!", "Impresionante!"
 };
 
 
@@ -144,6 +144,20 @@ void playNextFile()
     HAL_GPIO_WritePin(YellowLED_GPIO_Port, YellowLED_Pin, GPIO_PIN_RESET);
 }
 
+void playTheGame()
+{
+	if (!wavPlayer_fileSelect("11.wav"));
+
+	wavPlayer_play();
+
+	while (!wavPlayer_isFinished())
+	{
+		wavPlayer_process();
+	}
+
+	wavPlayer_stop();
+}
+
 void startApplication()
 {
 	//THIS LINE CAUSES THE TIMING ISSUES WITH KEYS
@@ -156,16 +170,8 @@ void startApplication()
     //GPIO Logic helps handle concurrency problems
     HAL_GPIO_WritePin(YellowLED_GPIO_Port, YellowLED_Pin, GPIO_PIN_RESET);
 
-	if (!wavPlayer_fileSelect("11.wav"));
-
-	wavPlayer_play();
-
-	while (!wavPlayer_isFinished())
-	{
-		wavPlayer_process();
-	}
-
-	wavPlayer_stop();
+    // silly intro
+	playTheGame();
 
     //GPIO Logic helps handle concurrency problems
     HAL_GPIO_WritePin(YellowLED_GPIO_Port, YellowLED_Pin, GPIO_PIN_RESET);
@@ -331,7 +337,7 @@ void showCorrection()
 {
     Lcd_clear(&lcd);
     Lcd_cursor(&lcd, 0, 0);
-    Lcd_string(&lcd, "Correcto: ");
+    Lcd_string(&lcd, "Respuesta Correcto: "); // we can make this fit on new screen; translates to "correct answer:"
     Lcd_cursor(&lcd, 1, 0);
     Lcd_string(&lcd, expected_word);
 }

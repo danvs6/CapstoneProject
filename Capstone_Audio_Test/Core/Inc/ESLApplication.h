@@ -20,6 +20,8 @@ void startApplication();
 //end
 void endApplication();
 
+void playTheGame();
+
 //help user
 void handleHelpFunction();
 
