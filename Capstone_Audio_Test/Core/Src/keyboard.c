@@ -101,10 +101,11 @@ void processKeyPress(char key, Lcd_HandleTypeDef *lcd, int *screenRow, int *scre
 			case KEY_END:
 			{
 				started = 0;
+
 				HAL_Delay(20);
 				processSpecialKey(key, 1);
 				HAL_Delay(20);
-				//memset(current_word, 0, sizeof(current_word));  // Reset current_word to empty
+
 				break;
 			}
 
@@ -113,12 +114,15 @@ void processKeyPress(char key, Lcd_HandleTypeDef *lcd, int *screenRow, int *scre
 				HAL_Delay(20);
 				processSpecialKey(key, 1);
 				HAL_Delay(20);
+
 				break;
 			}
 
 			case KEY_START:
+			{
 				HAL_Delay(20);
 				break; // do nothing
+			}
 
 			default:
 			{
@@ -134,6 +138,7 @@ void processKeyPress(char key, Lcd_HandleTypeDef *lcd, int *screenRow, int *scre
 					Lcd_string(lcd, keyString);  // Display the character
 					moveCursor(lcd, screenRow, screenColumn);  // Move cursor forward
 				}
+
 				break;
 			}
 		}
