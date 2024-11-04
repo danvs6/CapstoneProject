@@ -1,10 +1,3 @@
-/*
- * app.h
- *
- *  Created on: Oct 28, 2024
- *      Author: cuphi
- */
-
 #ifndef APP_H_
 #define APP_H_
 
@@ -20,12 +13,12 @@ extern char txtFileName[16];
 extern char expectedWord[MAX_WORD_LENGTH];
 extern char userInput[MAX_WORD_LENGTH];
 
-void appMainLoop(void);
 int initializeDAC_USB();
-void processAudioFiles(void);
 
 void initializeIndices(uint8_t *array, int n);
+
 void fisherYatesShuffle(uint8_t *array, int n);
+
 int readWordFromFile(const char *fileName, char *buffer, size_t bufferSize);
 
 #endif /* APP_H_ */

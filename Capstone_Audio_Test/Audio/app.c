@@ -30,22 +30,6 @@ char txtFileName[16];
 char expectedWord[MAX_WORD_LENGTH];
 char userInput[MAX_WORD_LENGTH];
 
-void initializeIndices(uint8_t *array, int n);
-void fisherYatesShuffle(uint8_t *array, int n);
-int readWordFromFile(const char *fileName, char *buffer, size_t bufferSize);
-void processAudioFiles(void);
-
-
-// main while-loop code
-void appMainLoop(void) {
-	initializeDAC_USB();
-
-    if (Appli_state == APPLICATION_READY) {
-        if (HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0)) {
-            processAudioFiles();
-        }
-    }
-}
 
 int initializeDAC_USB() {
 	static bool isSdCardMounted = 0;
@@ -67,48 +51,6 @@ int initializeDAC_USB() {
 		}
 	}
 	return isSdCardMounted;
-}
-
-void processAudioFiles(void) {
-	// Iterate through each wav file
-	for (int i = 0; i < NUM_FILES; i++) {
-		HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13, GPIO_PIN_SET); // Indicate button pressed
-
-		// Generate the file names
-		snprintf(wavFileName, sizeof(wavFileName), "%d.wav", fileIndices[i]);
-		snprintf(txtFileName, sizeof(txtFileName), "%d.txt", fileIndices[i]);
-
-		//if (wavPlayer_fileSelect(wavFileName) != WAV_OK) {
-		if (!wavPlayer_fileSelect(wavFileName)) {
-			HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13, GPIO_PIN_RESET);
-			continue;
-		}
-
-		wavPlayer_play();
-
-		// Wait until the current wav file is finished playing
-		while (!wavPlayer_isFinished()) {
-			wavPlayer_process();
-		}
-
-		wavPlayer_stop();
-
-		HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13, GPIO_PIN_RESET); // Indicate playback ended
-
-		// TODO:
-		// 1. Read from the text file using readWordFromFile
-		// 2. Get the user input (needs implementation)
-		// 3. Compare the user input with the expected word (needs implementation)
-		// 4. Trigger a feedback mechanism (e.g., LED)
-
-		// Wait for the user to press the pushbutton to begin playing the next file
-		while (!HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0)) {
-			HAL_Delay(100);  // Debounce delay
-		}
-	}
-
-	// Shuffle the audio files after each full playback sequence
-	fisherYatesShuffle(fileIndices, NUM_FILES);
 }
 
 void initializeIndices(uint8_t *array, int n) {
