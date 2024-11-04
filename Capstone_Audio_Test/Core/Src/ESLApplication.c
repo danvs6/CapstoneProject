@@ -321,7 +321,7 @@ void showEncouragement() {
     Lcd_string(&lcd, (char *)encouragementMessages[randomIndex]);
 }
 
-//counters can cause locking, try to find better way
+//counters can cause locking
 
 
 

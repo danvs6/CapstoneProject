@@ -72,7 +72,6 @@ volatile int screenColumn = 0;
 volatile int screenRow = 0;
 volatile int keyDetected = 0;
 
-
 char current_word[32] = "";  // Global word buffer with space for 32 characters
 //PRESS ENTER WITH EXPECTED WORD AND IT DELETES
 char expected_word[32] = "HELLO";
@@ -163,8 +162,6 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	//appMainLoop();
-
 	  scanKeyboard(&lcd, &screenRow, &screenColumn);
 	  MX_USB_HOST_Process();
 
