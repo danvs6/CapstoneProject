@@ -89,6 +89,7 @@ void repeatAudio()
 {
 	//GPIO Logic helps handle concurrency problems
 	HAL_GPIO_WritePin(YellowLED_GPIO_Port, YellowLED_Pin, GPIO_PIN_RESET);
+	HAL_Delay(5);
 
 	snprintf(wavFileName, sizeof(wavFileName), "%d.wav", fileIndices[current_index]);
 	if (!wavPlayer_fileSelect(wavFileName));
@@ -104,6 +105,7 @@ void repeatAudio()
 
 	//GPIO Logic helps handle concurrency problems
 	HAL_GPIO_WritePin(YellowLED_GPIO_Port, YellowLED_Pin, GPIO_PIN_RESET);
+	HAL_Delay(5);
 }
 
 // Helper function to play the next file and handle index reset
