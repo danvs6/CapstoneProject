@@ -52,6 +52,7 @@ void processKeyPress(char key, Lcd_HandleTypeDef *lcd, int *screenRow, int *scre
 {
 	if(started)
 	{
+		HAL_Delay(10);
 		switch (key)
 		{
 			case KEY_DELETE:
