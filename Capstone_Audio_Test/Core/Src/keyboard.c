@@ -180,7 +180,6 @@ uint8_t rowReadjustment(uint8_t current_row)
 // keyboard matrix scanner
 void scanKeyboard(Lcd_HandleTypeDef *lcd, int *screenRow, int *screenColumn)
 {
-	if (keyDetected) return;
 
 	for (columnNumber = 0; columnNumber < 11; columnNumber++)  // Cycle through all columns
 	{
@@ -189,7 +188,7 @@ void scanKeyboard(Lcd_HandleTypeDef *lcd, int *screenRow, int *screenColumn)
 		// Check if a key is pressed in the current column
 		if (readMuxInput() == 0)  // 0 indicates a key press in the current column
 		{
-			HAL_Delay(5);  // Short delay for debouncing
+			HAL_Delay(1);  // Short delay for debouncing
 
 			// Check if key press is still detected after debounce
 			if (readMuxInput() == 0)
@@ -210,7 +209,7 @@ void scanKeyboard(Lcd_HandleTypeDef *lcd, int *screenRow, int *screenColumn)
 
 				// Reset keyDetected after the key is released
 				keyDetected = 0;
-				return;
+				break;
 			}
 		}
 	}
