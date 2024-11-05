@@ -1,10 +1,3 @@
-/*
- * wav_player.c
- *
- *  Created on: 17 September 2024
- *      Author: Phi Lu
- */
-
 #include "wav_player.h"
 #include "audioI2S.h"
 #include "fatfs.h"

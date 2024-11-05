@@ -22,6 +22,10 @@ void endApplication();
 
 void playTheGame();
 
+void playCorrectSound();
+
+void playWrongSound();
+
 //help user
 void handleHelpFunction();
 
