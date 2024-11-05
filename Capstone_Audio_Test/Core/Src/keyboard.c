@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <string.h>
+#include <stdatomic.h>
 #include "keyboard.h"
 #include "screen.h"
 #include "gpio.h"
@@ -9,11 +10,12 @@
 // External variables from main.c
 extern uint8_t columnNumber;
 extern uint8_t current_row;
-extern int keyDetected;
+extern atomic_int keyDetected;
 extern char current_word[32];
 extern char expected_word[32];
 
 int started = 0;
+int languageChosen = 0;
 char languageCode[10] = "";
 
 // keyboard mapping
@@ -148,7 +150,7 @@ void processKeyPress(char key, Lcd_HandleTypeDef *lcd, int *screenRow, int *scre
 
 	else // application not started
 	{
-		if(key == KEY_START)
+		if(key == KEY_START && languageChosen)
 		{
 			started = 1;
 			Lcd_clear(lcd);  // Clear the display
@@ -161,21 +163,24 @@ void processKeyPress(char key, Lcd_HandleTypeDef *lcd, int *screenRow, int *scre
 			HAL_Delay(20);
 		}
 
-		else if (key == 'S')
+		else if (key == 'E')
 		{
 			strcpy(languageCode, "Espanol"); // copy string into language code
+			languageChosen = 1;
 			startUpScreen();
 		}
 
 		else if (key == 'F')
 		{
 			strcpy(languageCode, "Francais"); // copy string into language code
+			languageChosen = 1;
 			startUpScreen();
 		}
 
-		else if (key == 'G')
+		else if (key == 'D')
 		{
 			strcpy(languageCode, "Deutsch"); // copy string into language code
+			languageChosen = 1;
 			startUpScreen();
 		}
 	}
@@ -213,7 +218,7 @@ void scanKeyboard(Lcd_HandleTypeDef *lcd, int *screenRow, int *screenColumn)
 			// Check if key press is still detected after debounce
 			if (readMuxInput() == 0)
 			{
-				keyDetected = 1;  // Stop the timer from iterating through rows
+				atomic_store(&keyDetected, 1);  // Stop the timer from iterating through rows
 
 				// Adjust the row due to the clock
 				current_row = rowReadjustment(current_row);
@@ -228,7 +233,7 @@ void scanKeyboard(Lcd_HandleTypeDef *lcd, int *screenRow, int *screenColumn)
 				while (readMuxInput() == 0);
 
 				// Reset keyDetected after the key is released
-				keyDetected = 0;
+				atomic_store(&keyDetected, 0);
 				break;
 			}
 		}

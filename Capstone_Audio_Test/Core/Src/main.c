@@ -36,7 +36,7 @@
 #include <time.h>
 #include <string.h>
 #include "app.h"
-
+#include <stdatomic.h>
 #include <stdio.h>
 #include <stdint.h>
 #include "screen.h"
@@ -66,11 +66,11 @@ Lcd_HandleTypeDef lcd;
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-volatile uint8_t columnNumber = 0;
-volatile uint8_t current_row = 0;
-volatile int screenColumn = 0;
-volatile int screenRow = 0;
-volatile int keyDetected = 0;
+uint8_t columnNumber = 0;
+uint8_t current_row = 0;
+int screenColumn = 0;
+int screenRow = 0;
+atomic_int keyDetected = 0;
 
 // Global word array with space for 32 characters
 char current_word[32] = "";
@@ -221,7 +221,7 @@ void SystemClock_Config(void)
 /* USER CODE BEGIN 4 */
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) // 4 kHz clock
 {
-	if (htim -> Instance == TIM2 && keyDetected == 0)
+	if (htim -> Instance == TIM2 && atomic_load(&keyDetected) == 0)
 	{
 		// Reset all rows to high
 		HAL_GPIO_WritePin(Y0_GPIO_Port, Y0_Pin, SET);

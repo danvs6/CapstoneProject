@@ -22,15 +22,25 @@ extern char userInput[MAX_WORD_LENGTH];
 extern uint8_t fileIndices[NUM_FILES];
 extern Lcd_HandleTypeDef lcd;
 extern int started;
-extern int keyDetected;
-extern char languageCode[8];
+extern int languageChosen;
+extern atomic_int keyDetected;
+extern char languageCode[10];
 
 
-const char *encouragementMessages[] = {
+const char *encouragementMessagesSpanish[] = {
     "Sigue asi!", "Bien hecho!", "Excelente!",
 	"Fantastico!", "Muy bien!", "Impresionante!"
 };
 
+const char *encouragementMessagesFrench[] = {
+    "Continue comme ca!", "Bien joue!", "Excellent!",
+    "Fantastique!", "Tres bien!", "Impressionnant!"
+};
+
+const char *encouragementMessagesGerman[] = {
+    "Mach weiter so!", "Gut gemacht!", "Ausgezeichnet!",
+    "Fantastisch!", "Sehr gut!", "Beeindruckend!"
+};
 
 void capitalizeWord(char *word) {
     for (int i = 0; word[i] != '\0'; i++) {
@@ -40,15 +50,18 @@ void capitalizeWord(char *word) {
 
 void chooseLanguageScreen()
 {
+	languageChosen = 0;
+	started = 0;
 	Lcd_clear(&lcd);
 	Lcd_cursor(&lcd, 0, 0);
 	Lcd_string(&lcd, "Choose Language:");
 	Lcd_cursor(&lcd, 1, 0);
-	Lcd_string(&lcd, "S. Espanol F. Francais G. Deutsch");
+	Lcd_string(&lcd, "E. Espanol F. Francais D. Deutsch");
 }
 
 void startUpScreen()
 {
+	Lcd_clear(&lcd);
 	if (strcmp(languageCode, "Espanol") == 0)
 	{
 		  Lcd_cursor(&lcd, 0, 0);
@@ -120,7 +133,25 @@ void repeatAudio()
 	//GPIO Logic helps handle concurrency problems
 	HAL_GPIO_WritePin(YellowLED_GPIO_Port, YellowLED_Pin, GPIO_PIN_RESET);
 
-	snprintf(wavFileName, sizeof(wavFileName), "span/%d.wav", fileIndices[current_index]);
+	const char *languageFolder;
+
+	if (strcmp(languageCode, "Espanol") == 0)
+	{
+		languageFolder = "Spanish";
+	}
+
+	else if (strcmp(languageCode, "Francais") == 0)
+	{
+		languageFolder = "French";
+	}
+
+	else if (strcmp(languageCode, "Deutsch") == 0)
+	{
+		languageFolder = "German";
+	}
+
+	snprintf(wavFileName, sizeof(wavFileName), "%s/%d.wav", languageFolder, fileIndices[current_index]);
+
 	if (!wavPlayer_fileSelect(wavFileName));
 
 	wavPlayer_play();
@@ -139,18 +170,33 @@ void repeatAudio()
 // Helper function to play the next file and handle index reset
 void playNextFile()
 {
-	//GPIO Logic helps handle concurrency problems
-	HAL_GPIO_WritePin(YellowLED_GPIO_Port, YellowLED_Pin, GPIO_PIN_RESET);
+	// Check if current_index exceeds NUM_FILES
+	if (atomic_load(&current_index) >= NUM_FILES) {
+		// Shuffle the files again and reset the index
+		fisherYatesShuffle(fileIndices, NUM_FILES);
+		atomic_store(&current_index, 1);
+	}
 
-    // Check if current_index exceeds NUM_FILES
-    if (atomic_load(&current_index) >= NUM_FILES) {
-        // Shuffle the files again and reset the index
-        fisherYatesShuffle(fileIndices, NUM_FILES);
-        atomic_store(&current_index, 1);
-    }
+	const char *languageFolder;
 
-    snprintf(wavFileName, sizeof(wavFileName), "span/%d.wav", fileIndices[current_index]);
-    snprintf(txtFileName, sizeof(txtFileName), "span/%d.txt", fileIndices[current_index]);
+	if (strcmp(languageCode, "Espanol") == 0)
+	{
+		languageFolder = "Spanish";
+	}
+
+	else if (strcmp(languageCode, "Francais") == 0)
+	{
+		languageFolder = "French";
+	}
+
+	else if (strcmp(languageCode, "Deutsch") == 0)
+	{
+		languageFolder = "German";
+	}
+
+	snprintf(wavFileName, sizeof(wavFileName), "%s/%d.wav", languageFolder, fileIndices[current_index]);
+	snprintf(txtFileName, sizeof(txtFileName), "%s/%d.txt", languageFolder, fileIndices[current_index]);
+
 
     // Attempt to select and play the audio file
     if (!wavPlayer_fileSelect(wavFileName));
@@ -196,6 +242,8 @@ void playTheGame()
 
 void playCorrectSound()
 {
+	//GPIO Logic helps handle concurrency problems
+	HAL_GPIO_WritePin(YellowLED_GPIO_Port, YellowLED_Pin, GPIO_PIN_RESET);
 	if (!wavPlayer_fileSelect("ding.wav"));
 
 	wavPlayer_play();
@@ -206,10 +254,14 @@ void playCorrectSound()
 	}
 
 	wavPlayer_stop();
+	//GPIO Logic helps handle concurrency problems
+	HAL_GPIO_WritePin(YellowLED_GPIO_Port, YellowLED_Pin, GPIO_PIN_RESET);
 }
 
 void playWrongSound()
 {
+	//GPIO Logic helps handle concurrency problems
+	HAL_GPIO_WritePin(YellowLED_GPIO_Port, GreenLED_Pin, GPIO_PIN_RESET);
 	if (!wavPlayer_fileSelect("x.wav"));
 
 	wavPlayer_play();
@@ -220,6 +272,8 @@ void playWrongSound()
 	}
 
 	wavPlayer_stop();
+	//GPIO Logic helps handle concurrency problems
+	HAL_GPIO_WritePin(YellowLED_GPIO_Port, GreenLED_Pin, GPIO_PIN_RESET);
 }
 
 void startApplication()
@@ -280,7 +334,7 @@ void handleCorrectWord()
 //end
 void endApplication()
 {
-	startUpScreen();
+	chooseLanguageScreen();
 }
 
 //locking issues with counters
@@ -410,7 +464,20 @@ void showEncouragement()
     int randomIndex = rand() % 6;  // Get a random message
     Lcd_clear(&lcd);
     Lcd_cursor(&lcd, 0, 0);
-    Lcd_string(&lcd, (char *)encouragementMessages[randomIndex]);
+    if (strcmp(languageCode, "Espanol") == 0)
+	{
+    	Lcd_string(&lcd, (char *)encouragementMessagesSpanish[randomIndex]);
+	}
+
+	else if (strcmp(languageCode, "Francais") == 0)
+	{
+		Lcd_string(&lcd, (char *)encouragementMessagesFrench[randomIndex]);
+	}
+
+	else if (strcmp(languageCode, "Deutsch") == 0)
+	{
+		Lcd_string(&lcd, (char *)encouragementMessagesGerman[randomIndex]);
+	}
 }
 
 
