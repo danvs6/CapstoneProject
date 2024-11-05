@@ -10,6 +10,8 @@
 
 void capitalizeWord(char *word);
 
+void chooseLanguageScreen();
+
 void startUpScreen();
 
 void processSpecialKey(char key, int correct);

@@ -23,6 +23,7 @@ extern uint8_t fileIndices[NUM_FILES];
 extern Lcd_HandleTypeDef lcd;
 extern int started;
 extern int keyDetected;
+extern char languageCode[8];
 
 
 const char *encouragementMessages[] = {
@@ -37,12 +38,41 @@ void capitalizeWord(char *word) {
     }
 }
 
+void chooseLanguageScreen()
+{
+	Lcd_clear(&lcd);
+	Lcd_cursor(&lcd, 0, 0);
+	Lcd_string(&lcd, "Choose Language:");
+	Lcd_cursor(&lcd, 1, 0);
+	Lcd_string(&lcd, "S. Espanol F. Francais G. Deutsch");
+}
+
 void startUpScreen()
 {
-	  Lcd_cursor(&lcd, 0, 0);  // Set cursor to the first row, first column
-	  Lcd_string(&lcd, "Presione 'Start'");  // Display "Press" on the first row
-	  Lcd_cursor(&lcd, 1, 0);  // Set cursor to the second row, first column
-	  Lcd_string(&lcd, "para comenzar");  // Display "Start" on the second row
+	if (strcmp(languageCode, "Espanol") == 0)
+	{
+		  Lcd_cursor(&lcd, 0, 0);
+		  Lcd_string(&lcd, "Presione 'Start'");
+		  Lcd_cursor(&lcd, 1, 0);
+		  Lcd_string(&lcd, "para comenzar");
+	}
+
+	else if (strcmp(languageCode, "Francais") == 0)
+	{
+		  Lcd_cursor(&lcd, 0, 0);
+		  Lcd_string(&lcd, "Appuyez sur 'Start'");
+		  Lcd_cursor(&lcd, 1, 0);
+		  Lcd_string(&lcd, "pour commencer");
+	}
+
+	else if (strcmp(languageCode, "Deutsch") == 0)
+	{
+		  Lcd_cursor(&lcd, 0, 0);
+		  Lcd_string(&lcd, "Drucken Sie 'Start'");
+		  Lcd_cursor(&lcd, 1, 0);
+		  Lcd_string(&lcd, "um zu beginnen");
+	}
+
 }
 
 void processSpecialKey(char key, int correct)
@@ -382,8 +412,6 @@ void showEncouragement()
     Lcd_cursor(&lcd, 0, 0);
     Lcd_string(&lcd, (char *)encouragementMessages[randomIndex]);
 }
-
-//counters can cause locking
 
 
 

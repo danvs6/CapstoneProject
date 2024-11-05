@@ -14,6 +14,7 @@ extern char current_word[32];
 extern char expected_word[32];
 
 int started = 0;
+char languageCode[10] = "";
 
 // keyboard mapping
 char keyboardMap[3][11] = {
@@ -158,6 +159,24 @@ void processKeyPress(char key, Lcd_HandleTypeDef *lcd, int *screenRow, int *scre
 			HAL_Delay(20);
 			processSpecialKey(key, 1);
 			HAL_Delay(20);
+		}
+
+		else if (key == 'S')
+		{
+			strcpy(languageCode, "Espanol"); // copy string into language code
+			startUpScreen();
+		}
+
+		else if (key == 'F')
+		{
+			strcpy(languageCode, "Francais"); // copy string into language code
+			startUpScreen();
+		}
+
+		else if (key == 'G')
+		{
+			strcpy(languageCode, "Deutsch"); // copy string into language code
+			startUpScreen();
 		}
 	}
 }

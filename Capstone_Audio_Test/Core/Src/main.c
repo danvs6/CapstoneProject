@@ -149,7 +149,7 @@ int main(void)
   // initialize LCD
   Lcd_init(&lcd);
 
-  startUpScreen();
+  chooseLanguageScreen();
 
   // start timer
   if (HAL_TIM_Base_Start_IT(&htim2) != HAL_OK)
