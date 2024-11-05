@@ -26,8 +26,6 @@
 #include "tim.h"
 #include "usb_host.h"
 #include "gpio.h"
-#include "cmsis_os.h"
-
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -160,6 +158,7 @@ int main(void)
   }
 
   /* USER CODE END 2 */
+
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
@@ -168,6 +167,7 @@ int main(void)
 	  MX_USB_HOST_Process();
   }
     /* USER CODE END WHILE */
+    MX_USB_HOST_Process();
 
     /* USER CODE BEGIN 3 */
   /* USER CODE END 3 */

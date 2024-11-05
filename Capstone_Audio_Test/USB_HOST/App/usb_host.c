@@ -126,6 +126,7 @@ static void USBH_UserProcess  (USBH_HandleTypeDef *phost, uint8_t id)
   /* USER CODE END CALL_BACK_1 */
 }
 
+
 /**
   * @}
   */

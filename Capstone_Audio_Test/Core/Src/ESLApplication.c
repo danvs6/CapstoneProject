@@ -88,9 +88,9 @@ void processSpecialKey(char key, int correct)
 void repeatAudio()
 {
 	//GPIO Logic helps handle concurrency problems
-	HAL_GPIO_WritePin(YellowLED_GPIO_Port, YellowLED_Pin, GPIO_PIN_SET);
+	HAL_GPIO_WritePin(YellowLED_GPIO_Port, YellowLED_Pin, GPIO_PIN_RESET);
 
-	snprintf(wavFileName, sizeof(wavFileName), "%d.wav", fileIndices[current_index]);
+	snprintf(wavFileName, sizeof(wavFileName), "span/%d.wav", fileIndices[current_index]);
 	if (!wavPlayer_fileSelect(wavFileName));
 
 	wavPlayer_play();
@@ -119,8 +119,8 @@ void playNextFile()
         atomic_store(&current_index, 1);
     }
 
-    snprintf(wavFileName, sizeof(wavFileName), "%d.wav", fileIndices[current_index]);
-    snprintf(txtFileName, sizeof(txtFileName), "%d.txt", fileIndices[current_index]);
+    snprintf(wavFileName, sizeof(wavFileName), "span/%d.wav", fileIndices[current_index]);
+    snprintf(txtFileName, sizeof(txtFileName), "span/%d.txt", fileIndices[current_index]);
 
     // Attempt to select and play the audio file
     if (!wavPlayer_fileSelect(wavFileName));
@@ -149,7 +149,7 @@ void playTheGame()
    //GPIO Logic helps handle concurrency problems
 	HAL_GPIO_WritePin(YellowLED_GPIO_Port, YellowLED_Pin, GPIO_PIN_RESET);
 
-	if (!wavPlayer_fileSelect("11.wav"));
+	if (!wavPlayer_fileSelect("start.wav"));
 
 	wavPlayer_play();
 
@@ -174,7 +174,7 @@ void startApplication()
     fisherYatesShuffle(fileIndices, NUM_FILES);
 
     // silly intro
-	playTheGame();
+	//playTheGame();
 
     // Reset current index to 1
     atomic_store(&current_index, 1);
@@ -198,7 +198,18 @@ void handleCorrectWord()
     // To turn on the Green LED
     HAL_GPIO_WritePin(GreenLED_GPIO_Port, GreenLED_Pin, GPIO_PIN_SET);
 
-    HAL_Delay(2999);
+	if (!wavPlayer_fileSelect("ding.wav"));
+
+	wavPlayer_play();
+
+	while (!wavPlayer_isFinished())
+	{
+		wavPlayer_process();
+	}
+
+	wavPlayer_stop();
+
+    HAL_Delay(1999);
 
     // turn off green LED
     HAL_GPIO_WritePin(GreenLED_GPIO_Port, GreenLED_Pin, GPIO_PIN_RESET);
@@ -268,7 +279,7 @@ void handleHelpFunction()
             if (strlen(current_word) == strlen(expected_word))
             {
                 showCorrection();
-                HAL_Delay(2999);
+                HAL_Delay(1999);
                 handleNewPlayAfterRevealingWord();
             }
         }
@@ -300,7 +311,7 @@ void handleNewPlayAfterRevealingWord()
 	// To turn on the Yellow LED
 	HAL_GPIO_WritePin(YellowLED_GPIO_Port, YellowLED_Pin, GPIO_PIN_SET);
 
-	HAL_Delay(2999);
+	HAL_Delay(1999);
 
 	// To turn off the Yellow LED
 	HAL_GPIO_WritePin(YellowLED_GPIO_Port, YellowLED_Pin, GPIO_PIN_RESET);
@@ -319,7 +330,7 @@ void handleIncorrectWord()
 	if(currentEnterCount >= 5)
 	{
 		showCorrection();
-		HAL_Delay(2999);
+		HAL_Delay(1999);
 		handleNewPlayAfterRevealingWord();
 		return;
 	}
@@ -327,7 +338,18 @@ void handleIncorrectWord()
 	// To turn on the Yellow LED
 	HAL_GPIO_WritePin(YellowLED_GPIO_Port, YellowLED_Pin, GPIO_PIN_SET);
 
-	HAL_Delay(2999);
+	if (!wavPlayer_fileSelect("x.wav"));
+
+	wavPlayer_play();
+
+	while (!wavPlayer_isFinished())
+	{
+		wavPlayer_process();
+	}
+
+	wavPlayer_stop();
+
+	HAL_Delay(1999);
 
 	// To turn off the Yellow LED
 	HAL_GPIO_WritePin(YellowLED_GPIO_Port, YellowLED_Pin, GPIO_PIN_RESET);
