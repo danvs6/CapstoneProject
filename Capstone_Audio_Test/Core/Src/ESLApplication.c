@@ -164,6 +164,30 @@ void playTheGame()
     HAL_GPIO_WritePin(YellowLED_GPIO_Port, YellowLED_Pin, GPIO_PIN_RESET);
 }
 
+void playCorrectSound()
+{
+	if (!wavPlayer_fileSelect("ding.wav"))
+		;
+
+	wavPlayer_play();
+	while (!wavPlayer_isFinished()) {
+		wavPlayer_process();
+	}
+	wavPlayer_stop();
+}
+
+void playWrongSound()
+{
+	if (!wavPlayer_fileSelect("x.wav"))
+		;
+
+	wavPlayer_play();
+	while (!wavPlayer_isFinished()) {
+		wavPlayer_process();
+	}
+	wavPlayer_stop();
+}
+
 void startApplication()
 {
 	//THIS LINE CAUSES THE TIMING ISSUES WITH KEYS
@@ -184,6 +208,7 @@ void startApplication()
     playNextFile();
 }
 
+
 void handleCorrectWord()
 {
     // Clear screen and reset variables
@@ -198,16 +223,7 @@ void handleCorrectWord()
     // To turn on the Green LED
     HAL_GPIO_WritePin(GreenLED_GPIO_Port, GreenLED_Pin, GPIO_PIN_SET);
 
-	if (!wavPlayer_fileSelect("ding.wav"));
-
-	wavPlayer_play();
-
-	while (!wavPlayer_isFinished())
-	{
-		wavPlayer_process();
-	}
-
-	wavPlayer_stop();
+	playCorrectSound();
 
     HAL_Delay(1999);
 
@@ -338,16 +354,7 @@ void handleIncorrectWord()
 	// To turn on the Yellow LED
 	HAL_GPIO_WritePin(YellowLED_GPIO_Port, YellowLED_Pin, GPIO_PIN_SET);
 
-	if (!wavPlayer_fileSelect("x.wav"));
-
-	wavPlayer_play();
-
-	while (!wavPlayer_isFinished())
-	{
-		wavPlayer_process();
-	}
-
-	wavPlayer_stop();
+	playWrongSound();
 
 	HAL_Delay(1999);
 
