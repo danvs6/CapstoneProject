@@ -17,11 +17,14 @@
 #include <stdbool.h>
 #include <time.h>
 #include <stdatomic.h>
+#include "screen.h"
+
 
 extern ApplicationTypeDef Appli_state;
 extern I2C_HandleTypeDef hi2c1;
 extern I2S_HandleTypeDef hi2s3;
 extern RNG_HandleTypeDef hrng;
+extern Lcd_HandleTypeDef lcd;
 
 uint8_t fileIndices[NUM_FILES];
 
@@ -36,17 +39,22 @@ int initializeDAC_USB() {
 	static bool isSdCardMounted = 0;
 	MX_USB_HOST_Process();
 
-	if (Appli_state == APPLICATION_START) {
+	if (Appli_state == APPLICATION_START)
+	{
 		HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12, GPIO_PIN_SET); // USB application starts
 	}
-	else if (Appli_state == APPLICATION_DISCONNECT) {
+
+	else if (Appli_state == APPLICATION_DISCONNECT)
+	{
 		HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12, GPIO_PIN_RESET);
 		isSdCardMounted = 0;
 		wavPlayer_stop();
 	}
 
-	if (Appli_state == APPLICATION_READY) {
-		if (!isSdCardMounted) {
+	if (Appli_state == APPLICATION_READY)
+	{
+		if (!isSdCardMounted)
+		{
 			f_mount(&USBHFatFS, (const TCHAR*)USBHPath, 0);
 			isSdCardMounted = 1;
 		}

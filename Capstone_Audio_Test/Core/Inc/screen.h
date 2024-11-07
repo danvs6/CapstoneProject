@@ -101,4 +101,7 @@ void moveCursor(Lcd_HandleTypeDef *lcd, int *screenRow, int *screenColumn);
 // delete previous character and move cursor back
 void deletePreviousChar(Lcd_HandleTypeDef *lcd, int *screenRow, int *screenColumn);
 
+// turns display off
+void turnDisplayOff(Lcd_HandleTypeDef *lcd);
+
 #endif /* INC_SCREEN_H_ */

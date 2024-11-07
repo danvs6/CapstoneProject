@@ -25,12 +25,14 @@
 #include "usbh_msc.h"
 
 /* USER CODE BEGIN Includes */
+#include "ESLApplication.h"
+#include "screen.h"
 
 /* USER CODE END Includes */
 
 /* USER CODE BEGIN PV */
 /* Private variables ---------------------------------------------------------*/
-
+extern Lcd_HandleTypeDef lcd;
 /* USER CODE END PV */
 
 /* USER CODE BEGIN PFP */
@@ -110,6 +112,8 @@ static void USBH_UserProcess  (USBH_HandleTypeDef *phost, uint8_t id)
 
   case HOST_USER_DISCONNECTION:
   Appli_state = APPLICATION_DISCONNECT;
+  Lcd_clear(&lcd);
+  chooseLanguageScreen();
   break;
 
   case HOST_USER_CLASS_ACTIVE:

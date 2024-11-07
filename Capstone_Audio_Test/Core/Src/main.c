@@ -164,6 +164,7 @@ int main(void)
   while (1)
   {
 	  scanKeyboard(&lcd, &screenRow, &screenColumn);
+
 	  MX_USB_HOST_Process();
   }
     /* USER CODE END WHILE */

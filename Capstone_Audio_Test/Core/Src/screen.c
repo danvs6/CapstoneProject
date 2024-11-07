@@ -162,6 +162,11 @@ void deletePreviousChar(Lcd_HandleTypeDef *lcd, int *screenRow, int *screenColum
     Lcd_cursor(lcd, *screenRow, *screenColumn);
 }
 
+void turnDisplayOff(Lcd_HandleTypeDef *lcd)
+{
+	lcd_write_command(lcd, DISPLAY_ON_OFF_CONTROL);
+}
+
 
 
 /************************************** Static function definition **************************************/

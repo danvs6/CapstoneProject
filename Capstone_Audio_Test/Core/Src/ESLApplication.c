@@ -5,8 +5,9 @@
 #include "wav_player.h"
 #include <ctype.h>
 #include <stdlib.h>
-
 #include <stdatomic.h>
+#include "usb_host.h"
+
 
 // Define atomic counters
 volatile atomic_int helpCounter = 0;
@@ -25,6 +26,7 @@ extern int started;
 extern int languageChosen;
 extern atomic_int keyDetected;
 extern char languageCode[10];
+extern ApplicationTypeDef Appli_state;
 
 
 const char *encouragementMessagesSpanish[] = {
@@ -42,14 +44,18 @@ const char *encouragementMessagesGerman[] = {
     "Fantastisch!", "Sehr gut!", "Beeindruckend!"
 };
 
-void capitalizeWord(char *word) {
-    for (int i = 0; word[i] != '\0'; i++) {
+void capitalizeWord(char *word)
+{
+    for (int i = 0; word[i] != '\0'; i++)
+    {
         word[i] = toupper((unsigned char)word[i]);
     }
 }
 
 void chooseLanguageScreen()
 {
+	while (!(initializeDAC_USB()));
+
 	languageChosen = 0;
 	started = 0;
 	Lcd_clear(&lcd);
@@ -57,6 +63,7 @@ void chooseLanguageScreen()
 	Lcd_string(&lcd, "Choose Language:");
 	Lcd_cursor(&lcd, 1, 0);
 	Lcd_string(&lcd, "E. Espanol F. Francais D. Deutsch");
+
 }
 
 void startUpScreen()
@@ -279,7 +286,7 @@ void playWrongSound()
 void startApplication()
 {
 	//THIS LINE CAUSES THE TIMING ISSUES WITH KEYS
-	while (!(initializeDAC_USB()));
+	//while (!(initializeDAC_USB()));
 
     // Initialize and shuffle file indices
     initializeIndices(fileIndices, NUM_FILES);
@@ -313,7 +320,7 @@ void handleCorrectWord()
 
 	playCorrectSound();
 
-    HAL_Delay(1999);
+    HAL_Delay(999);
 
     // turn off green LED
     HAL_GPIO_WritePin(GreenLED_GPIO_Port, GreenLED_Pin, GPIO_PIN_RESET);
@@ -383,7 +390,7 @@ void handleHelpFunction()
             if (strlen(current_word) == strlen(expected_word))
             {
                 showCorrection();
-                HAL_Delay(1999);
+                HAL_Delay(999);
                 handleNewPlayAfterRevealingWord();
             }
         }
@@ -415,7 +422,7 @@ void handleNewPlayAfterRevealingWord()
 	// To turn on the Yellow LED
 	HAL_GPIO_WritePin(YellowLED_GPIO_Port, YellowLED_Pin, GPIO_PIN_SET);
 
-	HAL_Delay(1999);
+	HAL_Delay(999);
 
 	// To turn off the Yellow LED
 	HAL_GPIO_WritePin(YellowLED_GPIO_Port, YellowLED_Pin, GPIO_PIN_RESET);
@@ -434,7 +441,7 @@ void handleIncorrectWord()
 	if(currentEnterCount >= 5)
 	{
 		showCorrection();
-		HAL_Delay(1999);
+		HAL_Delay(999);
 		handleNewPlayAfterRevealingWord();
 		return;
 	}
@@ -444,7 +451,7 @@ void handleIncorrectWord()
 
 	playWrongSound();
 
-	HAL_Delay(1999);
+	HAL_Delay(999);
 
 	// To turn off the Yellow LED
 	HAL_GPIO_WritePin(YellowLED_GPIO_Port, YellowLED_Pin, GPIO_PIN_RESET);

@@ -205,7 +205,6 @@ uint8_t rowReadjustment(uint8_t current_row)
 // keyboard matrix scanner
 void scanKeyboard(Lcd_HandleTypeDef *lcd, int *screenRow, int *screenColumn)
 {
-
 	for (columnNumber = 0; columnNumber < 11; columnNumber++)  // Cycle through all columns
 	{
 		setMuxChannel(columnNumber);  // Set the multiplexer to the current column
