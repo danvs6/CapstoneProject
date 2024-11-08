@@ -167,7 +167,10 @@ void turnDisplayOff(Lcd_HandleTypeDef *lcd)
 	lcd_write_command(lcd, DISPLAY_ON_OFF_CONTROL);
 }
 
-
+void turnDisplayOn(Lcd_HandleTypeDef *lcd)
+{
+	lcd_write_command(lcd, DISPLAY_ON_OFF_CONTROL | OPT_D | OPT_C | OPT_B);
+}
 
 /************************************** Static function definition **************************************/
 

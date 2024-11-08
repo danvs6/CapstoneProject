@@ -6,7 +6,6 @@
 #include <ctype.h>
 #include <stdlib.h>
 #include <stdatomic.h>
-#include "usb_host.h"
 
 
 // Define atomic counters
@@ -26,7 +25,7 @@ extern int started;
 extern int languageChosen;
 extern atomic_int keyDetected;
 extern char languageCode[10];
-extern ApplicationTypeDef Appli_state;
+
 
 
 const char *encouragementMessagesSpanish[] = {

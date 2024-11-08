@@ -108,21 +108,23 @@ static void USBH_UserProcess  (USBH_HandleTypeDef *phost, uint8_t id)
   switch(id)
   {
   case HOST_USER_SELECT_CONFIGURATION:
-  break;
+	  break;
 
   case HOST_USER_DISCONNECTION:
-  Appli_state = APPLICATION_DISCONNECT;
-  Lcd_clear(&lcd);
-  chooseLanguageScreen();
-  break;
+	  Lcd_clear(&lcd);
+	  turnDisplayOff(&lcd);
+	  chooseLanguageScreen();
+	  Appli_state = APPLICATION_DISCONNECT;
+	  break;
 
   case HOST_USER_CLASS_ACTIVE:
-  Appli_state = APPLICATION_READY;
-  break;
+	  turnDisplayOn(&lcd);
+	  Appli_state = APPLICATION_READY;
+	  break;
 
   case HOST_USER_CONNECTION:
-  Appli_state = APPLICATION_START;
-  break;
+	  Appli_state = APPLICATION_START;
+	  break;
 
   default:
   break;

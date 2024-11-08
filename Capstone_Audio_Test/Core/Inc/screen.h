@@ -104,4 +104,7 @@ void deletePreviousChar(Lcd_HandleTypeDef *lcd, int *screenRow, int *screenColum
 // turns display off
 void turnDisplayOff(Lcd_HandleTypeDef *lcd);
 
+// turn display on
+void turnDisplayOn(Lcd_HandleTypeDef *lcd);
+
 #endif /* INC_SCREEN_H_ */
