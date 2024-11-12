@@ -73,8 +73,8 @@ int screenRow = 0;
 atomic_int keyDetected = 0;
 
 // Global word array with space for 32 characters
-char current_word[32] = "";
-char expected_word[32] = "";
+char current_word[80] = "";
+char expected_word[80] = "";
 
 /* USER CODE END PV */
 

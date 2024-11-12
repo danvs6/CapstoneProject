@@ -11,8 +11,8 @@
 extern uint8_t columnNumber;
 extern uint8_t current_row;
 extern atomic_int keyDetected;
-extern char current_word[32];
-extern char expected_word[32];
+extern char current_word[80];
+extern char expected_word[80];
 
 int started = 0;
 int languageChosen = 0;
@@ -74,7 +74,7 @@ void processKeyPress(char key, Lcd_HandleTypeDef *lcd, int *screenRow, int *scre
 			{
 				// Add space if there's room in current_word and on the screen
 				size_t len = strlen(current_word);
-				if (len < sizeof(current_word) - 1 && (*screenRow < 2 && *screenColumn <= 15))  // Allow up to 32 characters
+				if (len < sizeof(current_word) - 1 && (*screenRow < 4 && *screenColumn <= 19))  // Allow up to 32 characters
 				{
 					current_word[len] = ' ';  // Add space
 					current_word[len + 1] = '\0';  // Null-terminate
@@ -132,7 +132,7 @@ void processKeyPress(char key, Lcd_HandleTypeDef *lcd, int *screenRow, int *scre
 			{
 				// Add regular key to current_word, if there's space in current_word and on the screen
 				size_t len = strlen(current_word);
-				if (len < sizeof(current_word) - 1 && (*screenRow < 2 && *screenColumn <= 15))  // Allow up to 32 characters
+				if (len < sizeof(current_word) - 1 && (*screenRow < 4 && *screenColumn <= 19))  // Allow up to 32 characters
 				{
 					current_word[len] = key;
 					current_word[len + 1] = '\0';  // Null-terminate

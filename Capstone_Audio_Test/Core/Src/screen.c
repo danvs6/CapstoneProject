@@ -115,22 +115,22 @@ void Lcd_define_char(Lcd_HandleTypeDef * lcd, uint8_t code, uint8_t bitmap[])
 // move cursor
 void moveCursor(Lcd_HandleTypeDef *lcd, int *screenRow, int *screenColumn)
 {
-    if (*screenColumn < 15)  // Column index 0-15
+    if (*screenColumn < 19)  // Column index 0-15 -> 0-19
     {
         (*screenColumn)++;  // Move to the next column
     }
     else
     {
         // Move to the next row only if you're on row 0
-        if (*screenRow < 1)
+        if (*screenRow < 3)
         {
             (*screenRow)++;
             *screenColumn = 0;  // Reset column to 0 for the new row
         }
         else
         {
-            *screenRow = 1;  // Stay on the last row (row 1)
-            *screenColumn = 15;  // Stay at the last column (column 15)
+            *screenRow = 3;  // Stay on the last row (row 1)
+            *screenColumn = 19;  // Stay at the last column (column 15 -> 19)
         }
     }
 
@@ -149,7 +149,7 @@ void deletePreviousChar(Lcd_HandleTypeDef *lcd, int *screenRow, int *screenColum
     else if (*screenRow > 0)
     {
         (*screenRow)--;  // Move to the previous row
-        *screenColumn = 15;  // Set the column to the last column (15) of the previous row
+        *screenColumn = 19;  // Set the column to the last column (15 -> 19) of the previous row
     }
 
     // Set the cursor to the new position
@@ -170,6 +170,23 @@ void turnDisplayOff(Lcd_HandleTypeDef *lcd)
 void turnDisplayOn(Lcd_HandleTypeDef *lcd)
 {
 	lcd_write_command(lcd, DISPLAY_ON_OFF_CONTROL | OPT_D | OPT_C | OPT_B);
+}
+
+void centerString(Lcd_HandleTypeDef *lcd, int row, const char *str)
+{
+    int screenWidth = 20;  // Width of the 20x4 LCD screen
+    int strLength = strlen(str);
+
+    // Calculate the starting column to center the string
+    int startColumn = (screenWidth - strLength) / 2;
+
+    if (startColumn < 0) // Ensure startColumn isn't negative
+    {
+    	startColumn = 0;
+    }
+
+    // Set the cursor to the calculated position
+    Lcd_cursor(lcd, row, startColumn);
 }
 
 /************************************** Static function definition **************************************/

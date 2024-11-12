@@ -16,7 +16,7 @@ volatile atomic_int current_index = 1;
 
 extern int screenColumn;
 extern int screenRow;
-extern char current_word[32] ;  // Global word buffer with space for 32 characters
+extern char current_word[80] ;  // Global word buffer with space for 32 characters
 extern char expected_word[MAX_WORD_LENGTH];
 extern char userInput[MAX_WORD_LENGTH];
 extern uint8_t fileIndices[NUM_FILES];
@@ -25,7 +25,7 @@ extern int started;
 extern int languageChosen;
 extern atomic_int keyDetected;
 extern char languageCode[10];
-
+int score = 0;
 
 
 const char *encouragementMessagesSpanish[] = {
@@ -57,12 +57,20 @@ void chooseLanguageScreen()
 
 	languageChosen = 0;
 	started = 0;
+	score = 0;
 	Lcd_clear(&lcd);
-	Lcd_cursor(&lcd, 0, 0);
-	Lcd_string(&lcd, "Choose Language:");
-	Lcd_cursor(&lcd, 1, 0);
-	Lcd_string(&lcd, "E. Espanol F. Francais D. Deutsch");
 
+	centerString(&lcd, 0, "Choose Language:");
+	Lcd_string(&lcd, "Choose Language:");
+
+	centerString(&lcd, 1, "E. Espanol");
+	Lcd_string(&lcd, "E. Espanol");
+
+	centerString(&lcd, 2, "F. Francais");
+	Lcd_string(&lcd, "F. Francais");
+
+	centerString(&lcd, 3, "D. Deutsch");
+	Lcd_string(&lcd, "D. Deutsch");
 }
 
 void startUpScreen()
@@ -70,26 +78,29 @@ void startUpScreen()
 	Lcd_clear(&lcd);
 	if (strcmp(languageCode, "Espanol") == 0)
 	{
-		  Lcd_cursor(&lcd, 0, 0);
-		  Lcd_string(&lcd, "Presione 'Start'");
-		  Lcd_cursor(&lcd, 1, 0);
-		  Lcd_string(&lcd, "para comenzar");
+		centerString(&lcd, 1, "Presione 'Start'");
+		Lcd_string(&lcd, "Presione 'Start'");
+
+		centerString(&lcd, 2, "para comenzar");
+		Lcd_string(&lcd, "para comenzar");
 	}
 
 	else if (strcmp(languageCode, "Francais") == 0)
 	{
-		  Lcd_cursor(&lcd, 0, 0);
-		  Lcd_string(&lcd, "Appuyez sur 'Start'");
-		  Lcd_cursor(&lcd, 1, 0);
-		  Lcd_string(&lcd, "pour commencer");
+		centerString(&lcd, 1, "Appuyez sur 'Start'");
+		Lcd_string(&lcd, "Appuyez sur 'Start'");
+
+		centerString(&lcd, 2, "pour commencer");
+		Lcd_string(&lcd, "pour commencer");
 	}
 
 	else if (strcmp(languageCode, "Deutsch") == 0)
 	{
-		  Lcd_cursor(&lcd, 0, 0);
-		  Lcd_string(&lcd, "Drucken Sie 'Start'");
-		  Lcd_cursor(&lcd, 1, 0);
-		  Lcd_string(&lcd, "um zu beginnen");
+		centerString(&lcd, 1, "Drucken Sie 'Start'");
+		Lcd_string(&lcd, "Drucken Sie 'Start'");
+
+		centerString(&lcd, 2, "um zu beginnen");
+		Lcd_string(&lcd, "um zu beginnen");
 	}
 
 }
@@ -319,6 +330,8 @@ void handleCorrectWord()
 
 	playCorrectSound();
 
+	score++;
+
     HAL_Delay(999);
 
     // turn off green LED
@@ -340,6 +353,12 @@ void handleCorrectWord()
 //end
 void endApplication()
 {
+	centerString(&lcd, 1, "Score:");
+	Lcd_string(&lcd, "Score:");
+	Lcd_int(&lcd, score);
+
+	HAL_Delay(1999);
+
 	chooseLanguageScreen();
 }
 
@@ -460,8 +479,27 @@ void showCorrection()
 {
     Lcd_clear(&lcd);
     Lcd_cursor(&lcd, 0, 0);
-    Lcd_string(&lcd, "Respuesta Correcto: "); // we can make this fit on new screen; translates to "correct answer:"
-    Lcd_cursor(&lcd, 1, 0);
+
+    if (strcmp(languageCode, "Espanol") == 0)
+    {
+    	centerString(&lcd, 1, "Respuesta Correcto: ");
+    	Lcd_string(&lcd, "Respuesta Correcto: ");
+    }
+
+
+    else if (strcmp(languageCode, "Francais") == 0)
+    {
+    	centerString(&lcd, 1, "Bonne Reponse: ");
+    	Lcd_string(&lcd, "Bonne Reponse: ");
+    }
+
+    else if (strcmp(languageCode, "Deutsch") == 0)
+    {
+    	centerString(&lcd, 1, "Richtige Antwort: ");
+    	Lcd_string(&lcd, "Richtige Antwort: ");
+    }
+
+    centerString(&lcd, 2, expected_word);
     Lcd_string(&lcd, expected_word);
 }
 
@@ -472,16 +510,19 @@ void showEncouragement()
     Lcd_cursor(&lcd, 0, 0);
     if (strcmp(languageCode, "Espanol") == 0)
 	{
+    	centerString(&lcd, 1, (char *)encouragementMessagesSpanish[randomIndex]);
     	Lcd_string(&lcd, (char *)encouragementMessagesSpanish[randomIndex]);
 	}
 
 	else if (strcmp(languageCode, "Francais") == 0)
 	{
+		centerString(&lcd, 1, (char *)encouragementMessagesFrench[randomIndex]);
 		Lcd_string(&lcd, (char *)encouragementMessagesFrench[randomIndex]);
 	}
 
 	else if (strcmp(languageCode, "Deutsch") == 0)
 	{
+		centerString(&lcd, 1, (char *)encouragementMessagesGerman[randomIndex]);
 		Lcd_string(&lcd, (char *)encouragementMessagesGerman[randomIndex]);
 	}
 }

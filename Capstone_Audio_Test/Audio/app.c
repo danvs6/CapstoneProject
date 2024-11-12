@@ -1,10 +1,3 @@
-/*
- * app.c
- *
- *  Created on: Oct 28, 2024
- *      Author: cuphi
- */
-
 #include "app.h"
 #include "main.h"
 #include "fatfs.h"

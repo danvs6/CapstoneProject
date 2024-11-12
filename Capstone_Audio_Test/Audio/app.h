@@ -5,7 +5,7 @@
 #include <stddef.h>
 
 #define NUM_FILES 10
-#define MAX_WORD_LENGTH 32
+#define MAX_WORD_LENGTH 80
 
 extern uint8_t fileIndices[NUM_FILES];
 extern char wavFileName[16];

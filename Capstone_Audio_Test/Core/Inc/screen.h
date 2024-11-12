@@ -6,8 +6,8 @@
 #include "stdio.h"
 #include "main.h"
 
-// #define LCD20xN 		// For 20xN LCDs
-#define LCD16xN			// For 16xN LCDs
+#define LCD20xN 		// For 20xN LCDs
+//#define LCD16xN			// For 16xN LCDs
 
 // For row start addresses
 extern const uint8_t ROW_16[];
@@ -106,5 +106,8 @@ void turnDisplayOff(Lcd_HandleTypeDef *lcd);
 
 // turn display on
 void turnDisplayOn(Lcd_HandleTypeDef *lcd);
+
+// center string
+void centerString(Lcd_HandleTypeDef *lcd, int row, const char *str);
 
 #endif /* INC_SCREEN_H_ */
