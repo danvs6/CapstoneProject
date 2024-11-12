@@ -59,6 +59,8 @@ void chooseLanguageScreen()
 	started = 0;
 	score = 0;
 	Lcd_clear(&lcd);
+	//hide cursor
+	turnOffCursor(&lcd);
 
 	centerString(&lcd, 0, "Choose Language:");
 	Lcd_string(&lcd, "Choose Language:");
@@ -353,6 +355,7 @@ void handleCorrectWord()
 //end
 void endApplication()
 {
+	Lcd_clear(&lcd);
 	centerString(&lcd, 1, "Score:");
 	Lcd_string(&lcd, "Score:");
 	Lcd_int(&lcd, score);

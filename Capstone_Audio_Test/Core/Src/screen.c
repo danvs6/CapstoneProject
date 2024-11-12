@@ -58,6 +58,13 @@ void Lcd_init(Lcd_HandleTypeDef * lcd)
 	lcd_write_command(lcd, ENTRY_MODE_SET | OPT_INC);			// Increment cursor
 }
 
+void turnOffCursor(Lcd_HandleTypeDef * lcd){
+	lcd_write_command(lcd, DISPLAY_ON_OFF_CONTROL | OPT_D);
+}
+
+void turnOnCursor(Lcd_HandleTypeDef * lcd){
+	lcd_write_command(lcd, DISPLAY_ON_OFF_CONTROL | OPT_D | OPT_C | OPT_B);
+}
 /**
  * Write a number on the current position
  */

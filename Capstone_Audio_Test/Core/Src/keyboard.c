@@ -154,6 +154,7 @@ void processKeyPress(char key, Lcd_HandleTypeDef *lcd, int *screenRow, int *scre
 		{
 			started = 1;
 			Lcd_clear(lcd);  // Clear the display
+			turnOnCursor(lcd); // Set cursor
 			(*screenRow) = 0;
 			(*screenColumn) = 0;
 			moveCursor(lcd, 0,0); //move cursor to first position

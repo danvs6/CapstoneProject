@@ -76,6 +76,10 @@ typedef struct {
 // initialize LCD screen
 void Lcd_init(Lcd_HandleTypeDef * lcd);
 
+void turnOffCursor(Lcd_HandleTypeDef * lcd);
+
+void turnOnCursor(Lcd_HandleTypeDef * lcd);
+
 // print integer to LCD screen
 void Lcd_int(Lcd_HandleTypeDef * lcd, int number);
 
