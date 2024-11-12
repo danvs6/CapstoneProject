@@ -14,7 +14,7 @@ extern atomic_int keyDetected;
 extern char current_word[80];
 extern char expected_word[80];
 
-int started = 0;
+atomic_int started = 0;
 int languageChosen = 0;
 char languageCode[10] = "";
 
@@ -53,7 +53,7 @@ char getKeyPressed(uint8_t row, uint8_t col)
 // handle key press of each key
 void processKeyPress(char key, Lcd_HandleTypeDef *lcd, int *screenRow, int *screenColumn)
 {
-	if(started)
+	if(atomic_load(&started))
 	{
 		HAL_Delay(10);
 		switch (key)
@@ -104,7 +104,7 @@ void processKeyPress(char key, Lcd_HandleTypeDef *lcd, int *screenRow, int *scre
 
 			case KEY_END:
 			{
-				started = 0;
+				atomic_store(&started, 0);
 
 				HAL_Delay(20);
 				processSpecialKey(key, 1);
@@ -152,7 +152,7 @@ void processKeyPress(char key, Lcd_HandleTypeDef *lcd, int *screenRow, int *scre
 	{
 		if(key == KEY_START && languageChosen)
 		{
-			started = 1;
+			atomic_store(&started, 1);
 			Lcd_clear(lcd);  // Clear the display
 			turnOnCursor(lcd); // Set cursor
 			(*screenRow) = 0;

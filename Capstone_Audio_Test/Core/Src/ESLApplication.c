@@ -12,6 +12,7 @@
 volatile atomic_int helpCounter = 0;
 volatile atomic_int enterCounter = 0;
 volatile atomic_int current_index = 1;
+volatile atomic_int score = 0;
 
 
 extern int screenColumn;
@@ -21,11 +22,10 @@ extern char expected_word[MAX_WORD_LENGTH];
 extern char userInput[MAX_WORD_LENGTH];
 extern uint8_t fileIndices[NUM_FILES];
 extern Lcd_HandleTypeDef lcd;
-extern int started;
+extern atomic_int started;
 extern int languageChosen;
 extern atomic_int keyDetected;
 extern char languageCode[10];
-int score = 0;
 
 
 const char *encouragementMessagesSpanish[] = {
@@ -56,8 +56,8 @@ void chooseLanguageScreen()
 	while (!(initializeDAC_USB()));
 
 	languageChosen = 0;
-	started = 0;
-	score = 0;
+	atomic_store(&started, 0);
+	atomic_store(&score, 0);
 	Lcd_clear(&lcd);
 	//hide cursor
 	turnOffCursor(&lcd);
@@ -332,7 +332,7 @@ void handleCorrectWord()
 
 	playCorrectSound();
 
-	score++;
+	atomic_fetch_add(&score, 1);
 
     HAL_Delay(999);
 
@@ -356,9 +356,10 @@ void handleCorrectWord()
 void endApplication()
 {
 	Lcd_clear(&lcd);
+	turnOffCursor(&lcd);
 	centerString(&lcd, 1, "Score:");
 	Lcd_string(&lcd, "Score:");
-	Lcd_int(&lcd, score);
+	Lcd_int(&lcd, atomic_load(&score));
 
 	HAL_Delay(1999);
 
