@@ -114,4 +114,6 @@ void turnDisplayOn(Lcd_HandleTypeDef *lcd);
 // center string
 void centerString(Lcd_HandleTypeDef *lcd, int row, const char *str);
 
+void displayBorder(Lcd_HandleTypeDef *lcd);
+
 #endif /* INC_SCREEN_H_ */

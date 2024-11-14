@@ -78,6 +78,8 @@ void chooseLanguageScreen()
 void startUpScreen()
 {
 	Lcd_clear(&lcd);
+	displayBorder(&lcd);
+
 	if (strcmp(languageCode, "Espanol") == 0)
 	{
 		centerString(&lcd, 1, "Presione 'Start'");

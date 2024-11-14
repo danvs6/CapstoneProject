@@ -196,6 +196,32 @@ void centerString(Lcd_HandleTypeDef *lcd, int row, const char *str)
     Lcd_cursor(lcd, row, startColumn);
 }
 
+void displayBorder(Lcd_HandleTypeDef *lcd)
+{
+	// Top border
+	for (int col = 0; col < 20; col++)
+	{
+		Lcd_cursor(lcd, 0, col);
+		Lcd_string(lcd, "*");
+	}
+
+    // Bottom border
+    for (int col = 0; col < 20; col++)
+    {
+        Lcd_cursor(lcd, 3, col);
+        Lcd_string(lcd, "*");
+    }
+
+    // Left and right borders for the middle rows
+    for (int row = 1; row < 3; row++)
+    {
+        Lcd_cursor(lcd, row, 0);   // Left border
+        Lcd_string(lcd, "*");
+        Lcd_cursor(lcd, row, 19);  // Right border
+        Lcd_string(lcd, "*");
+    }
+}
+
 /************************************** Static function definition **************************************/
 
 /**
