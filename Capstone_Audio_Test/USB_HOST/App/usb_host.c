@@ -119,6 +119,7 @@ static void USBH_UserProcess  (USBH_HandleTypeDef *phost, uint8_t id)
 
   case HOST_USER_CLASS_ACTIVE:
 	  turnDisplayOn(&lcd);
+	  turnOffCursor(&lcd);
 	  Appli_state = APPLICATION_READY;
 	  break;
 

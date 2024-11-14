@@ -340,6 +340,7 @@ void handleCorrectWord()
     HAL_GPIO_WritePin(GreenLED_GPIO_Port, GreenLED_Pin, GPIO_PIN_RESET);
 
     Lcd_clear(&lcd);
+    turnOnCursor(&lcd);
 
     HAL_Delay(10);
 
@@ -414,6 +415,7 @@ void handleHelpFunction()
                 showCorrection();
                 HAL_Delay(999);
                 handleNewPlayAfterRevealingWord();
+                turnOnCursor(&lcd);
             }
         }
 
@@ -477,13 +479,14 @@ void handleIncorrectWord()
 
 	// To turn off the Yellow LED
 	HAL_GPIO_WritePin(YellowLED_GPIO_Port, YellowLED_Pin, GPIO_PIN_RESET);
+	turnOnCursor(&lcd);
 }
 
 void showCorrection()
 {
     Lcd_clear(&lcd);
     Lcd_cursor(&lcd, 0, 0);
-
+    turnOffCursor(&lcd);
     if (strcmp(languageCode, "Espanol") == 0)
     {
     	centerString(&lcd, 1, "Respuesta Correcto: ");
@@ -512,6 +515,7 @@ void showEncouragement()
     int randomIndex = rand() % 6;  // Get a random message
     Lcd_clear(&lcd);
     Lcd_cursor(&lcd, 0, 0);
+    turnOffCursor(&lcd);
     if (strcmp(languageCode, "Espanol") == 0)
 	{
     	centerString(&lcd, 1, (char *)encouragementMessagesSpanish[randomIndex]);
