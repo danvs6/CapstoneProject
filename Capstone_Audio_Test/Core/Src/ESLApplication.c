@@ -315,7 +315,6 @@ void startApplication()
     playNextFile();
 }
 
-
 void handleCorrectWord()
 {
     // Clear screen and reset variables
@@ -351,7 +350,6 @@ void handleCorrectWord()
 
     playNextFile();
 }
-
 
 //end
 void endApplication()
@@ -415,7 +413,6 @@ void handleHelpFunction()
                 showCorrection();
                 HAL_Delay(999);
                 handleNewPlayAfterRevealingWord();
-                turnOnCursor(&lcd);
             }
         }
 
@@ -454,6 +451,7 @@ void handleNewPlayAfterRevealingWord()
 	atomic_store(&helpCounter, 0);
 	atomic_store(&enterCounter, 0);
 	atomic_fetch_add(&current_index, 1);
+	turnOnCursor(&lcd);
 	playNextFile();
 }
 
