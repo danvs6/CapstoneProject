@@ -71,6 +71,12 @@ void wavPlayer_play(void)
   //Read Audio data from USB Disk
   f_lseek(&wavFile, 0);
   f_read (&wavFile, &audioBuffer[0], AUDIO_BUFFER_SIZE, &playerReadBytes);
+
+  if (playerReadBytes == 0) {
+      wavPlayer_stop();
+      return;
+  }
+
   audioRemainSize = fileLength - playerReadBytes;
   //Start playing the WAV
   audioI2S_play((uint16_t *)&audioBuffer[0], AUDIO_BUFFER_SIZE);
@@ -89,7 +95,12 @@ void wavPlayer_process(void)
   case PLAYER_CONTROL_HalfBuffer:
     playerReadBytes = 0;
     playerControlSM = PLAYER_CONTROL_Idle;
-    f_read (&wavFile, &audioBuffer[0], AUDIO_BUFFER_SIZE/2, &playerReadBytes);
+
+    if (f_read(&wavFile, &audioBuffer[0], AUDIO_BUFFER_SIZE / 2, &playerReadBytes) != FR_OK) {
+		wavPlayer_stop();
+		return;
+	}
+
     if(audioRemainSize > (AUDIO_BUFFER_SIZE / 2))
     {
       audioRemainSize -= playerReadBytes;
@@ -104,7 +115,13 @@ void wavPlayer_process(void)
   case PLAYER_CONTROL_FullBuffer:
     playerReadBytes = 0;
     playerControlSM = PLAYER_CONTROL_Idle;
-    f_read (&wavFile, &audioBuffer[AUDIO_BUFFER_SIZE/2], AUDIO_BUFFER_SIZE/2, &playerReadBytes);
+
+
+    if (f_read(&wavFile, &audioBuffer[AUDIO_BUFFER_SIZE / 2], AUDIO_BUFFER_SIZE / 2, &playerReadBytes) != FR_OK) {
+	   wavPlayer_stop();
+	   return;
+    }
+
     if(audioRemainSize > (AUDIO_BUFFER_SIZE / 2))
     {
       audioRemainSize -= playerReadBytes;

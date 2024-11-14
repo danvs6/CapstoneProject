@@ -67,8 +67,8 @@ void appMainLoop(void) {
                 HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13, GPIO_PIN_SET); // Indicate button pressed
 
                 // Generate the file names
-                snprintf(wavFileName, sizeof(wavFileName), "%d.wav", fileIndices[i]);
-                snprintf(txtFileName, sizeof(txtFileName), "%d.txt", fileIndices[i]);
+                snprintf(wavFileName, sizeof(wavFileName), "Spanish/%d.wav", fileIndices[i]);
+                snprintf(txtFileName, sizeof(txtFileName), "Spanish/%d.txt", fileIndices[i]);
 
                 //if (wavPlayer_fileSelect(wavFileName) != WAV_OK) {
                 if (!wavPlayer_fileSelect(wavFileName)) {
