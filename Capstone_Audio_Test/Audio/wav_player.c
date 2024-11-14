@@ -64,14 +64,11 @@ void wavPlayer_play(void)
   //Read Audio data from USB Disk
   f_lseek(&wavFile, 0);
 
-  if (f_read(&wavFile, &audioBuffer[0], AUDIO_BUFFER_SIZE, &playerReadBytes) != FR_OK) {
-	  wavPlayer_stop();
-	  return;
+  if (f_read(&wavFile, &audioBuffer[0], AUDIO_BUFFER_SIZE, &playerReadBytes) == FR_OK) {
+	  audioRemainSize = fileLength - playerReadBytes;
+	  //Start playing the WAV
+	  audioI2S_play((uint16_t *)&audioBuffer[0], AUDIO_BUFFER_SIZE);
   }
-
-  audioRemainSize = fileLength - playerReadBytes;
-  //Start playing the WAV
-  audioI2S_play((uint16_t *)&audioBuffer[0], AUDIO_BUFFER_SIZE);
 }
 
 /**

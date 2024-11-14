@@ -49,6 +49,8 @@ typedef struct
  * @brief Select WAV file to play
  * @retval returns true when file is found in USB Drive
  */
+void playAudioFromFlash();
+
 bool wavPlayer_fileSelect(const char* filePath);
 
 /**
