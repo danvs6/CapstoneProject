@@ -48,9 +48,8 @@
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-extern ApplicationTypeDef Appli_state;
-
 Lcd_HandleTypeDef lcd;
+
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/

@@ -27,12 +27,14 @@
 /* USER CODE BEGIN Includes */
 #include "ESLApplication.h"
 #include "screen.h"
+#include "keyboard.h"
 
 /* USER CODE END Includes */
 
 /* USER CODE BEGIN PV */
 /* Private variables ---------------------------------------------------------*/
 extern Lcd_HandleTypeDef lcd;
+extern int USB_detected;
 /* USER CODE END PV */
 
 /* USER CODE BEGIN PFP */
@@ -112,18 +114,17 @@ static void USBH_UserProcess  (USBH_HandleTypeDef *phost, uint8_t id)
 
   case HOST_USER_DISCONNECTION:
 	  Lcd_clear(&lcd);
-	  turnDisplayOff(&lcd);
+	  USB_detected = 0;
 	  chooseLanguageScreen();
 	  Appli_state = APPLICATION_DISCONNECT;
 	  break;
 
   case HOST_USER_CLASS_ACTIVE:
-	  turnDisplayOn(&lcd);
-	  turnOffCursor(&lcd);
 	  Appli_state = APPLICATION_READY;
 	  break;
 
   case HOST_USER_CONNECTION:
+	  USB_detected = 1;
 	  Appli_state = APPLICATION_START;
 	  break;
 

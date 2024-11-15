@@ -16,6 +16,7 @@ extern char expected_word[80];
 
 atomic_int started = 0;
 int languageChosen = 0;
+int USB_detected = 0;
 char languageCode[10] = "";
 
 // keyboard mapping
@@ -164,21 +165,21 @@ void processKeyPress(char key, Lcd_HandleTypeDef *lcd, int *screenRow, int *scre
 			HAL_Delay(20);
 		}
 
-		else if (key == 'E')
+		else if (key == 'E' && USB_detected)
 		{
 			strcpy(languageCode, "Espanol"); // copy string into language code
 			languageChosen = 1;
 			startUpScreen();
 		}
 
-		else if (key == 'F')
+		else if (key == 'F' && USB_detected)
 		{
 			strcpy(languageCode, "Francais"); // copy string into language code
 			languageChosen = 1;
 			startUpScreen();
 		}
 
-		else if (key == 'D')
+		else if (key == 'D' && USB_detected)
 		{
 			strcpy(languageCode, "Deutsch"); // copy string into language code
 			languageChosen = 1;
