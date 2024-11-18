@@ -4,7 +4,7 @@
 #include <stdint.h>
 #include <stddef.h>
 
-#define NUM_FILES 10
+#define NUM_FILES 50
 #define MAX_WORD_LENGTH 80
 
 extern uint8_t fileIndices[NUM_FILES];
