@@ -23,6 +23,7 @@
 #include "usb_host.h"
 #include "usbh_core.h"
 #include "usbh_msc.h"
+#include <stdatomic.h>
 
 /* USER CODE BEGIN Includes */
 #include "ESLApplication.h"
@@ -34,7 +35,7 @@
 /* USER CODE BEGIN PV */
 /* Private variables ---------------------------------------------------------*/
 extern Lcd_HandleTypeDef lcd;
-extern int USB_detected;
+extern atomic_int USB_detected;
 /* USER CODE END PV */
 
 /* USER CODE BEGIN PFP */
@@ -114,7 +115,7 @@ static void USBH_UserProcess  (USBH_HandleTypeDef *phost, uint8_t id)
 
   case HOST_USER_DISCONNECTION:
 	  Lcd_clear(&lcd);
-	  USB_detected = 0;
+	  atomic_store(&USB_detected, 0);
 	  chooseLanguageScreen();
 	  Appli_state = APPLICATION_DISCONNECT;
 	  break;
@@ -124,7 +125,7 @@ static void USBH_UserProcess  (USBH_HandleTypeDef *phost, uint8_t id)
 	  break;
 
   case HOST_USER_CONNECTION:
-	  USB_detected = 1;
+	  atomic_store(&USB_detected, 1);
 	  Appli_state = APPLICATION_START;
 	  break;
 
