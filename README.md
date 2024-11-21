@@ -1,2 +1,4 @@
 # CapstoneProject
 ESL Audio Comprehension Aid
+
+The ESL (English as a Second Language) Audio Comprehension Aid project aims to develop an offline, interactive tool to enhance English vocabulary and comprehension skills for non-native English-speaking primary school children without internet access. The device integrates a custom-made keyboard, speaker, and LCD screen controlled by an ST32F407G1-DISC1 microcontroller all in a 3D-printed plastic case. This tool allows the users to practice listening exercises for single-word translations and typing on a keyboard without the need for an internet connection. The project addresses the inequality of language access, particularly in underfunded, non-English-speaking communities, by offering a low-cost solution for improving English listening comprehension offline.
