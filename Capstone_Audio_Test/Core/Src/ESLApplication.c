@@ -78,36 +78,72 @@ void chooseLanguageScreen()
 void startUpScreen()
 {
 	Lcd_clear(&lcd);
-	displayBorder(&lcd);
+
+	HAL_Delay(9);
 
 	if (strcmp(languageCode, "Espanol") == 0)
 	{
-		centerString(&lcd, 1, "Presione 'Start'");
+		centerString(&lcd, 0, "Presione 'Start'");
 		Lcd_string(&lcd, "Presione 'Start'");
 
-		centerString(&lcd, 2, "para comenzar");
+
+		centerString(&lcd, 1, "para comenzar");
 		Lcd_string(&lcd, "para comenzar");
+
+
+		centerString(&lcd, 2, "Escribe lo");
+		Lcd_string(&lcd, "Escribe lo");
+
+
+		centerString(&lcd, 3, "que escuchas");
+		Lcd_string(&lcd, "que escuchas");
+
 	}
 
 	else if (strcmp(languageCode, "Francais") == 0)
 	{
-		centerString(&lcd, 1, "Appuyez sur 'Start'");
+		centerString(&lcd, 0, "Appuyez sur 'Start'");
 		Lcd_string(&lcd, "Appuyez sur 'Start'");
 
-		centerString(&lcd, 2, "pour commencer");
+
+		centerString(&lcd, 1, "pour commencer");
 		Lcd_string(&lcd, "pour commencer");
+
+
+		centerString(&lcd, 2, "Ecrivez ce que");
+		Lcd_string(&lcd, "Ecrivez ce que");
+
+
+		centerString(&lcd, 3, "vous entendez");
+		Lcd_string(&lcd, "vous entendez");
+
 	}
 
 	else if (strcmp(languageCode, "Deutsch") == 0)
 	{
-		centerString(&lcd, 1, "Drucken Sie 'Start'");
+		centerString(&lcd, 0, "Drucken Sie 'Start'");
 		Lcd_string(&lcd, "Drucken Sie 'Start'");
 
-		centerString(&lcd, 2, "um zu beginnen");
+		HAL_Delay(0);
+
+		centerString(&lcd, 1, "um zu beginnen");
 		Lcd_string(&lcd, "um zu beginnen");
+
+		HAL_Delay(0);
+
+		centerString(&lcd, 2, "Schreiben Sie auf,");
+		Lcd_string(&lcd, "Schreiben Sie auf,");
+
+		HAL_Delay(0);
+
+		centerString(&lcd, 3, "was Sie horen");
+		Lcd_string(&lcd, "was Sie horen");
+
+		HAL_Delay(0);
 	}
 
 }
+
 
 void processSpecialKey(char key, int correct)
 {
@@ -454,6 +490,7 @@ void handleNewPlayAfterRevealingWord()
 	atomic_store(&enterCounter, 0);
 	atomic_fetch_add(&current_index, 1);
 	turnOnCursor(&lcd);
+
 	playNextFile();
 }
 
